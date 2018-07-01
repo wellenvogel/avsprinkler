@@ -1,0 +1,65 @@
+{
+  "gpio": {
+    "outputs": [
+      {
+        "channel": 1,
+        "gpio": 10
+      },
+      {
+        "channel": 2,
+        "gpio": 9
+      },
+      {
+        "channel": 3,
+        "gpio": 25
+      },
+      {
+        "channel": 4,
+        "gpio": 11
+      },
+      {
+        "channel": 5,
+        "gpio": 8
+      },
+      {
+        "channel": 6,
+        "gpio": 7
+      }
+    ],
+    "inputs": [
+      {
+        "channel": 0,
+        "gpio": 27
+      },
+      {
+        "channel": 1,
+        "gpio": 18
+      },
+      {
+        "channel": 2,
+        "gpio": 17
+      },
+      {
+        "channel": 3,
+        "gpio": 15
+      },
+      {
+        "channel": 4,
+        "gpio": 14
+      },
+      {
+        "channel": 5,
+        "gpio": 4
+      },
+      {
+        "channel": 6,
+        "gpio": 3
+      }
+    ],
+    "meter":{
+      "gpio":24,
+      "channel":0
+    }
+
+  }
+}
