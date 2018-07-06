@@ -3,7 +3,8 @@
     "outputs": [
       {
         "channel": 1,
-        "gpio": 10
+        "gpio": 10,
+        "name": "Aussen links"
       },
       {
         "channel": 2,

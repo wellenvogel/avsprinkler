@@ -70,6 +70,12 @@ class Controller:
       }
     }
 
+  def getBaseInfo(self):
+    return {
+      'outputs': map(lambda o: o.info(),self.hardware.outputs),
+      'inputs': map(lambda o: o.info(), self.hardware.inputs)
+    }
+
   def timerRun(self):
     while True:
       try:

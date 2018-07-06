@@ -30,6 +30,12 @@ class ChannelDevice:
     return (GPIO.input(self.getGpio()) != DEFAULT_OUT)
   def getName(self):
     return self.name
+  def info(self):
+    return{
+      'channel': self.getChannel(),
+      'name':self.getName(),
+      'gpio':self.getGpio()
+    }
 
 class Output(ChannelDevice):
   def __init__(self,cfg,deadHandler):
@@ -65,6 +71,11 @@ class Output(ChannelDevice):
     return self.accumulatedCount
   def getStartCount(self):
     return self.getStartCount()
+  def info(self):
+    rt=ChannelDevice.info(self)
+    rt['accumulatedTime']=self.accumulated
+    rt['accumulatedCount']=self.accumulatedCount
+    return rt
 
 class Input(ChannelDevice):
   def __init__(self,cfg,deadHandler,pup=GPIO.PUD_UP):
