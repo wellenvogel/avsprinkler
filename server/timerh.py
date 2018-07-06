@@ -11,19 +11,24 @@ DEFAULT_RUNTIME=15*60
 basedir=os.path.dirname(os.path.relpath(__file__))
 
 class TimerEntry:
+  TOLERANCE=3600 #at maximum we start timers from one hour back
   def __init__(self,channel,weekday,start,duration):
     '''
 
     :param channel: the channel id to start
     :param weekday: the day of the week (0...6), 0 is monday
     :param start: the start time in hh:mm
-    :param duration: is seconds
+    :param duration: is minutes
     '''
     self.channel=channel
     self.weekday=weekday
     self.start=start
     self.duration=duration
     self.lastRun=None
+
+  @classmethod
+  def parse(cls,map):
+    return cls(map['channel'],map['weekday'],map['start'],map['duration'])
 
   def clone(self):
     rt=TimerEntry(self.channel,self.weekday,self.start,self.duration)
@@ -47,27 +52,33 @@ class TimerEntry:
     '''
     if self.lastRun is not None and timestamp <= self.lastRun:
       return
-    last=self.lastRun
-    if last is None:
-      last=time.time()-1
     startTime=self.getStartTime()
-    dt=datetime.datetime.fromtimestamp(last)
-    if dt.weekday() == self.weekday and startTime < dt.time():
-      #wee need to start the next day...
-      dt+=datetime.timedelta(days=1)
-    loopmax=7
-    while dt.weekday() != self.weekday and loopmax > 0:
-      dt+=datetime.timedelta(days=1)
-      loopmax-=1
-    if dt.weekday() != self.weekday:
-      #strange - invalid weekday
+    dt=datetime.datetime.fromtimestamp(timestamp)
+    tol=datetime.datetime.fromtimestamp(timestamp-TimerEntry.TOLERANCE)
+    #at most we have 2 weekdays (TOLERANCE < 1 day!)
+    if dt.weekday() != self.weekday and tol.weekday() != self.weekday:
       return
-    nextStart=datetime.datetime.combine(dt.date(),startTime)
-    rt=time.mktime(nextStart.timetuple())
-    if rt > timestamp:
-      return None
-    return rt
+    next=None
+    if dt.weekday() == self.weekday:
+      next=datetime.datetime.combine(dt.date(),startTime)
+    else:
+      next=datetime.datetime.combine(tol.date(),startTime)
+    nextts=time.mktime(next.timetuple())
+    #next is now our candidate
+    #check that it is above lastRun but before/equal now
+    if self.lastRun is not None and nextts <= self.lastRun:
+      return
+    if nextts > timestamp or nextts < (timestamp - TimerEntry.TOLERANCE):
+      return
+    return nextts
 
+  def info(self):
+    return {
+      'channel':self.channel,
+      'weekday':self.weekday,
+      'start':self.start,
+      'duration':self.duration
+    }
 
 
 class TimerHandler:
@@ -107,7 +118,7 @@ class TimerHandler:
           nextFire=next
           nextTimer=timer
         else:
-          if nextTimer > next:
+          if nextFire > next:
             nextTimer=timer
             nextFire=next
     return nextTimer
@@ -125,3 +136,17 @@ class TimerHandler:
         time.sleep(1)
       except:
         print "Exception in timerloop"
+
+  def info(self):
+    return{
+      'number':len(self.timerlist),
+      'entries':map(lambda e:e.info(),self.timerlist)
+    }
+
+  def readFromJson(self,cfgStr,clear=False):
+    data=json.loads(cfgStr)
+    if clear:
+      self.clear()
+    for te in data['timer']:
+      newTimer=TimerEntry.parse(te)
+      self.addTimer(newTimer)

@@ -79,3 +79,11 @@ class TestTimerEntry(TestCase):
     next=te.nextFire(time.mktime(now.timetuple()))
     assert next is  None
 
+  def test_parse(self):
+    map={'channel':1,'weekday':0,'start':'09:40','duration':40}
+    te=timerh.TimerEntry.parse(map)
+    assert te.weekday==0
+    assert te.channel==1
+    assert te.start=='09:40'
+    assert te.duration==40
+
