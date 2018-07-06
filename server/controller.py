@@ -15,7 +15,7 @@ class Controller:
     configString = open(os.path.join(basedir, "config.json")).read()
     self.config = json.loads(configString)
     self.hardware=hardware.Hardware()
-    self.active=None
+    self.activeChannel=None
     self.stopTime=None
     self.timerThread=threading.Thread(target=self.timerRun)
     self.timerThread.daemon=True
@@ -23,38 +23,53 @@ class Controller:
     for ch in range(0, 7):
       self.hardware.getInput(ch).registerCallback(self.__cb)
   def stop(self):
-    if self.active is None:
+    if self.activeChannel is None:
       return
     print "switching off %d"%(self.active.getChannel())
-    self.active.switchOff()
-    self.active=None
+    self.hardware.startOutput(self.activeChannel)
+    self.activeChannel=None
   def __cb(self,channel):
     if channel == 0:
       self.stop()
     else:
       self.start(channel)
-  def start(self,channel):
-    self.stop()
-    op=self.hardware.getOutput(channel)
-    if op is None:
-      return
+  def start(self,channel,runtime=None):
+    if self.activeChannel is not None and self.activeChannel != channel:
+      self.stop()
     self.stopTime=None
     now = time.time()
-    cfg=self.config.get(str(channel))
-    if cfg is not None:
-      runtime=cfg.get("runtime")
-      if runtime is not None:
-        self.stopTime=now+int(runtime)
+    if runtime is None:
+      cfg=self.config.get(str(channel))
+      if cfg is not None:
+        runtime=cfg.get("runtime")
+        if runtime is not None:
+          self.stopTime=now+int(runtime)
+    else:
+      self.stopTime=now + runtime
     if self.stopTime is None:
       self.stopTime=now + DEFAULT_RUNTIME
     print "switching on %d till %s"%(channel, time.ctime(self.stopTime))
-    self.active=op
-    op.switchOn()
+    self.activeChannel=channel
+    self.hardware.startOutput(channel)
+
+  def getStatus(self):
+    if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
+      return { 'status':'off'}
+    ch=self.hardware.getOutput(self.activeChannel)
+    return {
+      'status': 'on',
+      'channel': {
+        'id':ch.getChannel(),
+        'name':ch.getName(),
+        'started':ch.getSwitchTime(),
+        'running':time.time()-ch.getSwitchTime()
+      }
+    }
 
   def timerRun(self):
     while True:
       try:
-        if self.active is not None and self.stopTime is not None:
+        if self.activeChannel is not None and self.stopTime is not None:
           now=time.time()
           if now >= self.stopTime:
             self.stop()
