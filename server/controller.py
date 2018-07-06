@@ -1,3 +1,6 @@
+import logging
+
+import Constants
 import hardware
 import time
 import json
@@ -12,6 +15,7 @@ basedir=os.path.dirname(os.path.relpath(__file__))
 
 class Controller:
   def __init__(self):
+    self.logger = logging.getLogger(Constants.LOGNAME)
     configString = open(os.path.join(basedir, "config.json")).read()
     self.config = json.loads(configString)
     self.hardware=hardware.Hardware()
@@ -25,8 +29,8 @@ class Controller:
   def stop(self):
     if self.activeChannel is None:
       return
-    print "switching off %d"%(self.active.getChannel())
-    self.hardware.startOutput(self.activeChannel)
+    self.logger.info("switching off %d"%(self.activeChannel))
+    self.hardware.stopOutput(self.activeChannel)
     self.activeChannel=None
   def __cb(self,channel):
     if channel == 0:
@@ -48,7 +52,7 @@ class Controller:
       self.stopTime=now + runtime
     if self.stopTime is None:
       self.stopTime=now + DEFAULT_RUNTIME
-    print "switching on %d till %s"%(channel, time.ctime(self.stopTime))
+    self.logger.info("switching on %d till %s"%(channel, time.ctime(self.stopTime)))
     self.activeChannel=channel
     self.hardware.startOutput(channel)
 
@@ -75,4 +79,4 @@ class Controller:
             self.stop()
         time.sleep(1)
       except:
-        print "Exception in timerloop"
+        self.logger.warn("Exception in timerloop")

@@ -1,7 +1,11 @@
+import logging
+
 import RPi.GPIO as GPIO
 import json
 import os
 import time
+
+import Constants
 
 basedir=os.path.dirname(os.path.relpath(__file__))
 DEFAULT_OUT=GPIO.HIGH
@@ -11,6 +15,7 @@ DEAD_TIME=0.9
 
 class ChannelDevice:
   def __init__(self,cfg,deadHandler=None):
+    self.logger = logging.getLogger(Constants.LOGNAME)
     self.gpio = cfg['gpio']
     self.channel = int(cfg['channel'])
     self.name = "Channel %d" % (self.channel,)
@@ -35,7 +40,7 @@ class Output(ChannelDevice):
     self.accumulatedCount=0;
     GPIO.setup(self.getGpio(),GPIO.OUT)
     GPIO.output(self.getGpio(),DEFAULT_OUT)
-    print "setup output at gpio %d, value %d"%(self.getGpio(),DEFAULT_OUT)
+    self.logger.info("setup output at gpio %d, value %d"%(self.getGpio(),DEFAULT_OUT))
   def switchOn(self,count=0):
     self.switchTime=time.time()
     self.startcount=count
@@ -53,6 +58,7 @@ class Output(ChannelDevice):
     GPIO.output(self.getGpio(),DEFAULT_OUT)
     self.switchTime=None
     self.startcount=0
+    self.logger.info("switched off %d, count=%d"%(self.getChannel(),self.getAccumulatedCount()))
   def getSwitchTime(self):
     return self.switchTime
   def getAccumulatedCount(self):
@@ -65,7 +71,7 @@ class Input(ChannelDevice):
     ChannelDevice.__init__(self,cfg,deadHandler)
     self.callback=None
     GPIO.setup(self.getGpio(),GPIO.IN,pull_up_down = pup)
-    print "setup input at gpio %d" % (self.getGpio())
+    self.logger.info("setup input at gpio %d" % (self.getGpio()))
     GPIO.add_event_detect(self.getGpio(),GPIO.FALLING,callback=self.__callback,bouncetime=200)
   def registerCallback(self,callback):
     self.callback=callback
@@ -76,7 +82,7 @@ class Input(ChannelDevice):
     #time.sleep(0.001)
     #if not self.isOn():
     #  return
-    print "**callback*** %d"%(self.getChannel())
+    self.logger.info("**callback*** %d"%(self.getChannel()))
     if self.callback is not None:
       self.callback(self.getChannel())
 

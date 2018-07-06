@@ -1,0 +1,15 @@
+[Unit]
+Description=Sprinkler control
+After=syslog.target network.target
+
+
+[Service]
+User=pi
+ExecStart=/home/pi/sprinkler/main.py
+WorkingDirectory=/home/pi/sprinkler
+KillMode=control-group
+Restart=always
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
