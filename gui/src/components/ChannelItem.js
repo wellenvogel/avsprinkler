@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {ListItem} from 'react-toolbox/lib/list'
 import {Button, IconButton} from 'react-toolbox/lib/button';
 
+
 class ChannelItem extends Component{
     constructor(props){
         super(props);

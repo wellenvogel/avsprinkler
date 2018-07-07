@@ -3,7 +3,7 @@ import ToolBar from './components/ToolBar';
 import IconButton from 'react-toolbox/lib/button';
 import {List} from 'react-toolbox/lib/list';
 import ChannelItem from './components/ChannelItem';
-
+import Dialog from 'react-toolbox/lib/dialog';
 
 const urlbase="/control";
 class ExampleView extends Component {
@@ -14,6 +14,7 @@ class ExampleView extends Component {
         this.onStart=this.onStart.bind(this);
         this.onStop=this.onStop.bind(this);
         this.fetchStatus=this.fetchStatus.bind(this);
+        this.durationChange=this.durationChange.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -39,6 +40,13 @@ class ExampleView extends Component {
     render() {
         let self=this;
         let info=this.state;
+        let dialogActions=[
+            {label:"Abbrechen",onClick: function(){self.setState({dialogVisible:false})}},
+            {label:"OK",onClick: function(){
+                self.runCommand("start",urlbase+"?request=start&channel="+self.state.channel+"&duration="+(self.state.duration||15)*60);
+                self.setState({dialogVisible:false});
+            }}
+        ];
         let title=info.title||"Sprinkler";
         if (! info.data){
             return (<p>Loading...</p>);
@@ -73,8 +81,18 @@ class ExampleView extends Component {
                         return <ChannelItem {...props}/>
                     })}
                     </List>
+                <Dialog actions={dialogActions}
+                active={this.state.dialogVisible}
+                title={"Starte Kanal "+self.state.channel}>
+                    <p>Laufzeit(Minuten)</p>
+                    <input type="number"  value={self.state.duration||15} onChange={self.durationChange}/>
+                </Dialog>
+
             </div>
         );
+    }
+    durationChange(ev){
+        this.setState({duration:ev.target.value});
     }
     runCommand(text,url){
         let self=this;
@@ -95,7 +113,10 @@ class ExampleView extends Component {
         })
     }
     onStart(channel){
-        this.runCommand("start",urlbase+"?request=start&channel="+channel);
+        this.setState({
+            channel:channel,
+            dialogVisible:true
+        });
     }
     onStop(channel){
         this.runCommand("stop",urlbase+"?request=stop");
