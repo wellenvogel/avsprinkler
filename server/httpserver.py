@@ -204,7 +204,8 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       self.logger.debug("unable to process request for controlrequest ", text)
       self.sendJsonResponse(json.dumps({
         "status":"ERROR",
-        "info":text
+        "info":e.message,
+        "detail":text
       }),requestParam)
       return
 

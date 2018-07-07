@@ -4,15 +4,17 @@
       {
         "channel": 1,
         "gpio": 10,
-        "name": "Aussen links"
+        "name": "Aussen rechts"
       },
       {
         "channel": 2,
-        "gpio": 9
+        "gpio": 9,
+        "name": "Hochbeete"
       },
       {
         "channel": 3,
-        "gpio": 25
+        "gpio": 25,
+        "name": "Beet Terasse"
       },
       {
         "channel": 4,

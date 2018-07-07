@@ -19,14 +19,30 @@ class Main:
     if isinstance(rt, list):
       return rt[0].decode('utf-8', errors='ignore')
     return rt
-
+  def getTimerFileName(self):
+    return os.path.join(os.path.dirname(os.path.relpath(__file__)),"timer.json")
+  def saveTimers(self):
+    fn=self.getTimerFileName()
+    tmp=fn+".tmp"
+    timercfg=self.timers.toJson()
+    h=open(tmp,"w")
+    if h is not None:
+      h.write(timercfg)
+      h.close()
+      os.unlink(fn)
+      os.rename(tmp,fn)
+    else:
+      raise Exception("unable to open "+tmp)
   def handleRequest(self,param):
     request=self.getHttpRequestParam(param,'request')
     if  request is None or request == 'status':
       return {
-        'controller':self.controller.getStatus(),
-        'timer':self.timers.info(),
-        'channels':self.controller.getBaseInfo()
+        'status':'OK',
+        'data':{
+          'controller':self.controller.getStatus(),
+          'timer':self.timers.info(),
+          'channels':self.controller.getBaseInfo()
+        }
       }
     if request == "start":
       channel=self.getHttpRequestParam(param,'channel')
@@ -35,12 +51,53 @@ class Main:
         raise Exception("missing parameter channel")
       self.controller.start(int(channel),int(time) if time is not None else None)
       return{
-        'status':'OK'
+        'status':'OK',
+        'data': self.controller.getStatus()
       }
     if request == "stop":
       self.controller.stop()
       return {
         'status': 'OK'
+      }
+    if request == 'clearTimer':
+      channel = self.getHttpRequestParam(param, 'channel')
+      if channel is None:
+        raise Exception("missing parameter channel")
+      self.timers.removeByChannel(int(channel))
+      self.saveTimers()
+      return {
+        'status': 'OK',
+        'data': self.timers.info()
+      }
+    if request == 'addTimer':
+      rq=['channel','start','weekday','duration']
+      map={}
+      for r in rq:
+        p = self.getHttpRequestParam(param, r)
+        if p is None:
+          raise Exception("missing parameter "+r)
+        map[r]=p
+      map['duration']=int(map['duration'])
+      map['channel']=int(map['channel'])
+      map['weekday']=int(map['weekday'])
+      te=timerh.TimerEntry.parse(map)
+      self.timers.addTimer(te)
+      self.saveTimers()
+      return {
+        'status': 'OK',
+        'data':self.timers.info()
+      }
+    if request == 'stopTimers':
+      self.timers.pause()
+      return {
+        'status': 'OK',
+        'data': self.timers.info()
+      }
+    if request == 'startTimers':
+      self.timers.unpause()
+      return {
+        'status': 'OK',
+        'data': self.timers.info()
       }
     return {
       'status':'ERROR',
@@ -57,7 +114,7 @@ class Main:
     self.logger.addHandler(handler)
     self.logger.info("####Sprinkler started####")
     self.controller=controller.Controller()
-    timerfilename=os.path.join(os.path.dirname(os.path.relpath(__file__)),"timer.json")
+    timerfilename=self.getTimerFileName()
     self.timers = timerh.TimerHandler(self._timercb)
     if os.path.exists(timerfilename):
       self.logger.info("reading timers from %s"%(timerfilename))

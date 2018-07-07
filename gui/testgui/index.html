@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sprinkler</title>
+    <script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+<form method="get" class="startForm">
+    <p>Start Timer</p>
+    <input type="hidden" name="request" value="start">
+    <input type="text" name="channel" value="1">
+    <input type="text" name="duration" value="5">
+    <button id="startTimerButton" >Start</button>
+</form>
+<form method="get"class="stopForm">
+    <p>Stop Timer</p>
+    <input type="hidden" name="request" value="stop">
+    <button id="stopTimerButton">Stop</button>
+</form>
+<div class="status">
+    <p>Status</p>
+    <p id="statusContent"></p>
+</div>
+</body>
+</html>

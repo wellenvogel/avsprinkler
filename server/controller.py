@@ -58,7 +58,10 @@ class Controller:
 
   def getStatus(self):
     if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
-      return { 'status':'off'}
+      return {
+        'status':'off',
+        'meter': self.hardware.getMeter().getValue()
+      }
     ch=self.hardware.getOutput(self.activeChannel)
     return {
       'status': 'on',
@@ -66,8 +69,11 @@ class Controller:
         'id':ch.getChannel(),
         'name':ch.getName(),
         'started':ch.getSwitchTime(),
-        'running':time.time()-ch.getSwitchTime()
-      }
+        'running':time.time()-ch.getSwitchTime(),
+        'remain': (self.stopTime - time.time()) if self.stopTime is not None else 0,
+        'startCount':ch.getStartCount()
+      },
+      'meter': self.hardware.getMeter().getValue()
     }
 
   def getBaseInfo(self):

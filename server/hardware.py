@@ -70,7 +70,7 @@ class Output(ChannelDevice):
   def getAccumulatedCount(self):
     return self.accumulatedCount
   def getStartCount(self):
-    return self.getStartCount()
+    return self.startcount
   def info(self):
     rt=ChannelDevice.info(self)
     rt['accumulatedTime']=self.accumulated
@@ -97,16 +97,22 @@ class Input(ChannelDevice):
     if self.callback is not None:
       self.callback(self.getChannel())
 
-class Meter(Input):
+class Meter(ChannelDevice):
   def __init__(self,cfg,deadHandler):
     self.counter=0
     if cfg is None:
       return
-    Input.__init__(self, cfg,deadHandler)
-    self.registerCallback(self.meterCallback)
+    ChannelDevice.__init__(self, cfg,deadHandler)
+    GPIO.setup(self.getGpio(), GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    self.logger.info("setup input at gpio %d" % (self.getGpio()))
+    GPIO.add_event_detect(self.getGpio(), GPIO.FALLING, callback=self.meterCallback, bouncetime=50)
   def meterCallback(self,channel):
+    if self.deadHandler is not None:
+      if self.deadHandler.isDeadTime():
+        return
     self.counter+=1
-    print "meter callback, value=%d"%(self.counter)
+    if (self.counter % 1000) == 0:
+      self.logger.log("meter callback, value=%d"%(self.counter))
   def getValue(self):
     return self.counter
 

@@ -12,6 +12,7 @@ basedir=os.path.dirname(os.path.relpath(__file__))
 
 class TimerEntry:
   TOLERANCE=3600 #at maximum we start timers from one hour back
+  MAXDURATION=1800 #max. 30 minutes
   def __init__(self,channel,weekday,start,duration):
     '''
 
@@ -28,23 +29,55 @@ class TimerEntry:
 
   @classmethod
   def parse(cls,map):
-    return cls(map['channel'],map['weekday'],map['start'],map['duration'])
+    ch=map.get('channel')
+    if ch is None:
+      raise Exception("missing parameter channel")
+    wd=map.get('weekday')
+    if wd is None:
+      raise Exception("missing parameter weekday")
+    if wd < 0 or wd > 6:
+      raise Exception("invalid weekday %d, allowed: 0..6"%(wd))
+    st=map.get('start')
+    if st is None:
+      raise Exception("missing parameter start")
+    ts=cls.convertStartTime(st) #should raise an Exception
+    dur=map.get('duration')
+    if dur is None:
+      raise Exception("missing parameter duration")
+    if dur < 0 or dur > cls.MAXDURATION:
+      raise Exception("invalid duration %d, allowed 0...%d"%(dur,cls.MAXDURATION))
+    return cls(ch,wd,st,dur)
 
   def clone(self):
     rt=TimerEntry(self.channel,self.weekday,self.start,self.duration)
     return rt
-
+  @classmethod
+  def convertStartTime(cls,ts):
+    hhmm = ts.split(':')
+    startTime = datetime.time(hour=int(hhmm[0]), minute=int(hhmm[1]))
+    return startTime
   def getStartTime(self):
     '''
     get the starttime as time
     :return: datetime.time
     '''
-    hhmm = self.start.split(':')
-    startTime = datetime.time(hour=int(hhmm[0]), minute=int(hhmm[1]))
-    return startTime
+    return self.convertStartTime(self.start)
 
+  def checkOverlap(self,other):
+    if self.weekday != other.weekday:
+      return False
+    dummy=datetime.date(year=2018,month=1,day=1)
+    selfstart=time.mktime(datetime.datetime.combine(dummy,self.getStartTime()).timetuple())
+    otherstart=time.mktime(datetime.datetime.combine(dummy,other.getStartTime()).timetuple())
+    selfend=selfstart+self.duration
+    otherend=otherstart+other.duration
+    if selfstart <= otherstart and selfend >= otherstart:
+      return True
+    if selfstart > otherstart and otherend >= selfstart:
+      return True
+    return False
   def nextFire(self,timestamp):
-    '''
+    '''datetime.timedelta(seconds=
     return a timestamp for the next fire if there is one
     between lastRun and timestamp
     :param timestamp:
@@ -89,6 +122,7 @@ class TimerHandler:
       self.timerThread.start()
     self.timerlist=[]
     self.timerCallback=timerCallback
+    self.running=True
   def removeByChannel(self,channel):
     for idx in xrange(len(self.timerlist)-1,-1,-1):
       timer=self.timerlist[idx]
@@ -99,6 +133,9 @@ class TimerHandler:
       self.removeByChannel(timerEntry.channel)
     te=timerEntry.clone()
     te.lastRun=None
+    for timer in self.timerlist:
+      if timer.checkOverlap(te):
+        raise Exception("overlapping timer exists: %s"%(json.dumps(timer.info())))
     self.timerlist.append(te)
 
   def clear(self):
@@ -132,7 +169,8 @@ class TimerHandler:
   def timerRun(self):
     while True:
       try:
-        self.checkAndRunTimer(time.time())
+        if self.running:
+          self.checkAndRunTimer(time.time())
         time.sleep(1)
       except:
         print "Exception in timerloop"
@@ -140,6 +178,7 @@ class TimerHandler:
   def info(self):
     return{
       'number':len(self.timerlist),
+      'running':self.running,
       'entries':map(lambda e:e.info(),self.timerlist)
     }
 
@@ -150,3 +189,12 @@ class TimerHandler:
     for te in data['timer']:
       newTimer=TimerEntry.parse(te)
       self.addTimer(newTimer)
+
+  def toJson(self):
+    return json.dumps({
+      'timer':map(lambda t:t.info(),self.timerlist)
+    })
+  def pause(self):
+    self.running=False
+  def unpause(self):
+    self.running=True
