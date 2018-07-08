@@ -76,6 +76,19 @@ class Output(ChannelDevice):
     rt['accumulatedTime']=self.accumulated
     rt['accumulatedCount']=self.accumulatedCount
     return rt
+  def getStatus(self):
+    return {
+      'channel':self.channel,
+      'accumulatedTime':self.accumulated,
+      'accumulatedCount':self.accumulatedCount
+    }
+  def setStatus(self,map):
+    v=map.get('accumulatedTime')
+    if v is not None:
+      self.accumulated=v
+    v=map.get('accumulatedCount')
+    if v is not None:
+      self.accumulatedCount=v
 
 class Input(ChannelDevice):
   def __init__(self,cfg,deadHandler,pup=GPIO.PUD_UP):
@@ -115,6 +128,8 @@ class Meter(ChannelDevice):
       self.logger.log("meter callback, value=%d"%(self.counter))
   def getValue(self):
     return self.counter
+  def setValue(self,v):
+    self.counter=v
 
 class DeadHandler:
   def __init__(self):

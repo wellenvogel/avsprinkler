@@ -118,6 +118,7 @@ class Main:
     self.logger.addHandler(handler)
     self.logger.info("####Sprinkler started####")
     self.controller=controller.Controller()
+    self.controller.readStatus()
     timerfilename=self.getTimerFileName()
     self.timers = timerh.TimerHandler(self._timercb)
     if os.path.exists(timerfilename):

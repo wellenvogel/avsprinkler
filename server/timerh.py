@@ -123,6 +123,10 @@ class TimerHandler:
     self.timerlist=[]
     self.timerCallback=timerCallback
     self.running=True
+    self.id=1
+  def getNextId(self):
+    self.id+=1
+    return self.id
   def removeByChannel(self,channel,weekday=None,start=None):
     st=TimerEntry.convertStartTime(start) if start is not None else None
     for idx in xrange(len(self.timerlist)-1,-1,-1):
@@ -134,12 +138,26 @@ class TimerHandler:
     if deleteOther:
       self.removeByChannel(timerEntry.channel)
     te=timerEntry.clone()
+    te.id=self.getNextId()
     te.lastRun=None
     for timer in self.timerlist:
       if timer.checkOverlap(te):
         raise Exception("overlapping timer exists: %s"%(json.dumps(timer.info())))
     self.timerlist.append(te)
 
+  def updateTimerWithId(self, timerEntry):
+    if timerEntry.id is None:
+      raise Exception("missing id in updateTimerWithid")
+    for timer in self.timerlist:
+      if timer.id != timerEntry.id and timer.checkOverlap(timerEntry):
+        raise Exception("overlapping timer exists: %s" % (json.dumps(timer.info())))
+    for timer in self.timerlist:
+      if timer.id == timerEntry.id:
+        timer.weekday=timerEntry.weekday
+        timer.start=timerEntry.start
+        timer.duration=timerEntry.duration
+        return True
+    self.addTimer(timerEntry)
   def clear(self):
     self.timerlist=[]
 

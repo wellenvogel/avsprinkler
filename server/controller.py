@@ -26,12 +26,15 @@ class Controller:
     self.timerThread.start()
     for ch in range(0, 7):
       self.hardware.getInput(ch).registerCallback(self.__cb)
+  def getStatusFileName(self):
+    return os.path.join(basedir,"status.json")
   def stop(self):
     if self.activeChannel is None:
       return
     self.logger.info("switching off %d"%(self.activeChannel))
     self.hardware.stopOutput(self.activeChannel)
     self.activeChannel=None
+    self.writeStatus()
   def __cb(self,channel):
     if channel == 0:
       self.stop()
@@ -55,6 +58,7 @@ class Controller:
     self.logger.info("switching on %d till %s"%(channel, time.ctime(self.stopTime)))
     self.activeChannel=channel
     self.hardware.startOutput(channel)
+    self.writeStatus()
 
   def getStatus(self):
     if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
@@ -81,6 +85,42 @@ class Controller:
       'outputs': map(lambda o: o.info(),self.hardware.outputs),
       'inputs': map(lambda o: o.info(), self.hardware.inputs)
     }
+
+  def getPersistanceInfo(self):
+    rt={}
+    rt['outputs']=map(lambda o:o.getStatus(),self.hardware.outputs)
+    rt['meter']={'value':self.hardware.getMeter().getValue()}
+    return rt
+
+  def setPersistanceInfo(self,map):
+    op=map.get('outputs')
+    if op is not None:
+      for opi in op:
+        ch=opi.get('channel')
+        ce=self.hardware.getOutput(ch)
+        if ce is not None:
+          ce.setStatus(opi)
+    me=map.get('meter')
+    if me is not None:
+      v=me.get('value')
+      if v is not None:
+        self.hardware.getMeter().setValue(v)
+
+  def writeStatus(self):
+    fn=self.getStatusFileName()
+    h=open(fn,"w")
+    if h is not None:
+      h.write(json.dumps(self.getPersistanceInfo()))
+      h.close()
+
+  def readStatus(self):
+    try:
+      fn=self.getStatusFileName()
+      if os.path.exists(fn):
+        status=open(fn).read()
+        self.setPersistanceInfo(json.loads(status))
+    except:
+      self.logger.warn("execption in read status")
 
   def timerRun(self):
     while True:
