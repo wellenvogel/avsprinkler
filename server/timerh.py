@@ -123,11 +123,13 @@ class TimerHandler:
     self.timerlist=[]
     self.timerCallback=timerCallback
     self.running=True
-  def removeByChannel(self,channel):
+  def removeByChannel(self,channel,weekday=None,start=None):
+    st=TimerEntry.convertStartTime(start) if start is not None else None
     for idx in xrange(len(self.timerlist)-1,-1,-1):
       timer=self.timerlist[idx]
       if timer.channel==channel:
-        del self.timerlist[idx]
+        if ( weekday is None or weekday == timer.weekday) and (st is None or st == timer.getStartTime()):
+          del self.timerlist[idx]
   def addTimer(self,timerEntry,deleteOther=False):
     if deleteOther:
       self.removeByChannel(timerEntry.channel)

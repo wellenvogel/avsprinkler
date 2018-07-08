@@ -4,6 +4,10 @@ import Button from 'react-toolbox/lib/button';
 import TimerEntry from './components/TimerEntry';
 import {List} from 'react-toolbox/lib/list';
 import ButtonTheme from './style/theme/fabButton.less';
+import Dialog from 'react-toolbox/lib/dialog';
+import {RadioGroup,RadioButton} from 'react-toolbox/lib/radio';
+import Util from './components/Util';
+import RadioTheme from './style/theme/radioButton.less';
 
 
 const urlbase="/control";
@@ -16,6 +20,8 @@ class TimerView extends Component {
         this.fetchStatus=this.fetchStatus.bind(this);
         this.onItemClick=this.onItemClick.bind(this);
         this.onPlus=this.onPlus.bind(this);
+        this.vchange=this.vchange.bind(this);
+        this.hideDialog=this.hideDialog.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -77,6 +83,18 @@ class TimerView extends Component {
         let self=this;
         this.interval=setInterval(this.fetchStatus,2000);
         this.fetchStatus();
+        this.dialogEditActions=[
+            {label:'Löschen',onClick:function(){
+                self.hideDialog();
+            }},
+            {label:'Abbrechen',onClick:self.hideDialog},
+            {label:'Ok',onClick:function(){
+                self.hideDialog();
+            }}
+        ];
+        this.dialogNewActions=[];
+        this.dialogNewActions.push(this.dialogEditActions[1]);
+        this.dialogNewActions.push(this.dialogEditActions[2]);
     }
     componentWillUnmount(){
         clearInterval(this.interval);
@@ -92,6 +110,7 @@ class TimerView extends Component {
             }
         }
         let timers=this.getTimers(this.getChannel());
+        let wd=-1;
         return (
             <div className="view timerView">
                 <ToolBar leftIcon="arrow_back"
@@ -111,17 +130,51 @@ class TimerView extends Component {
                     </List>
                 </div>
                 <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
+                <Dialog
+                    active={this.state.dialogVisible}
+                    actions={this.state.dialogActions}
+                    title={"Timer"}>
+                    <RadioGroup value={this.state.dialogWeekday} onChange={function(v){self.vchange('dialogWeekday',v)}}>
+                        {Util.weekdays.map((el)=>{
+                            wd++;
+                            return <RadioButton label={el} value={wd} theme={RadioTheme}/>
+                        })}
+                    </RadioGroup>
+                    <input type="text" name="start" value={this.state.dialogStart} onChange={function(ev){self.vchange('dialogStart',ev.target.value)}}/>
+                    <input type="text" name="duration" value={this.state.dialogDuration} onChange={function(ev){self.vchange('dialogDuration',ev.target.value)}}/>
+                </Dialog>
+
             </div>
         );
+    }
+    vchange(name,value){
+        let ns={};
+        ns[name]=value;
+        this.setState(ns);
+    }
+    hideDialog(){
+        this.setState({dialogVisible:false});
     }
     goBack(){
         this.props.history.goBack();
     }
     onItemClick(te){
-        console.log("item click");
+        this.setState({
+            dialogVisible:true,
+            dialogWeekday:te.weekday,
+            dialogStart:te.start,
+            dialogDuration:te.duration,
+            dialogActions:this.dialogEditActions
+        });
     }
     onPlus(){
-        console.log("plus clicked")
+        this.setState({
+            dialogVisible:true,
+            dialogWeekday:0,
+            dialogStart:"06:00",
+            dialogDuration:15,
+            dialogActions:this.dialogNewActions
+        });
     }
 }
 

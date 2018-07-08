@@ -63,7 +63,11 @@ class Main:
       channel = self.getHttpRequestParam(param, 'channel')
       if channel is None:
         raise Exception("missing parameter channel")
-      self.timers.removeByChannel(int(channel))
+      weekday=self.getHttpRequestParam(param, 'weekday')
+      if weekday is not None:
+        weekday=int(weekday)
+      start=self.getHttpRequestParam(param, 'start')
+      self.timers.removeByChannel(int(channel),weekday=weekday,start=start)
       self.saveTimers()
       return {
         'status': 'OK',
