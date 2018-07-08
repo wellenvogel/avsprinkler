@@ -34,6 +34,10 @@ module.exports = function(env) {
                     ],
                 },
                 {
+                    test: /\.json$/,
+                    use: [ 'json-loader']
+                },
+                {
                     test: /node_modules.react-toolbox.*\.css$/,
                     use: [
                         "style-loader",

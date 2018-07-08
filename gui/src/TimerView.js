@@ -8,6 +8,10 @@ import Dialog from 'react-toolbox/lib/dialog';
 import {RadioGroup,RadioButton} from 'react-toolbox/lib/radio';
 import Util from './components/Util';
 import RadioTheme from './style/theme/radioButton.less';
+import Input from 'react-toolbox/lib/input';
+//import TimePicker from 'react-times';
+//import 'react-times/css/classic/default.css';
+
 
 
 const urlbase="/control";
@@ -22,6 +26,7 @@ class TimerView extends Component {
         this.onPlus=this.onPlus.bind(this);
         this.vchange=this.vchange.bind(this);
         this.hideDialog=this.hideDialog.bind(this);
+        this.timeChange=this.timeChange.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -161,23 +166,36 @@ class TimerView extends Component {
                             return <RadioButton label={el} value={wd} theme={RadioTheme}/>
                         })}
                     </RadioGroup>
-                    <input type="text" name="start" value={this.state.dialogStart} onChange={function(ev){self.vchange('dialogStart',ev.target.value)}}/>
-                    <input type="text" name="duration" value={this.state.dialogDuration} onChange={function(ev){self.vchange('dialogDuration',ev.target.value)}}/>
+                    <Input type="text" label="Start" value={this.state.dialogStart} onChange={self.timeChange}/>
+                    <Input type="text" name="duration" label="Dauer(Min)" value={this.state.dialogDuration} onChange={function(value){self.vchange('dialogDuration',value)}}/>
                 </Dialog>
 
             </div>
         );
     }
+
     vchange(name,value){
         let ns={};
         ns[name]=value;
         this.setState(ns);
+    }
+    timeChange(value){
+        this.setState({
+            dialogStart:value
+        });
     }
     hideDialog(){
         this.setState({dialogVisible:false});
     }
     goBack(){
         this.props.history.goBack();
+    }
+    startToDate(start){
+        let hhmm=start.split(':')
+        let d=new Date();
+        d.setHours(hhmm[0]);
+        d.setMinutes(hhmm[1]);
+        return d;
     }
     onItemClick(te){
         this.setState({
