@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {ListItem} from 'react-toolbox/lib/list'
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import theme from '../style/theme/listItem.less'
+import FontIcon from 'react-toolbox/lib/font_icon';
 
 class ChannelItem extends Component{
     constructor(props){
@@ -27,11 +28,17 @@ class ChannelItem extends Component{
         else{
             ltext+=this.countToL(this.props.count)+"l";
         }
-        return (<ListItem theme={theme}
-            caption={this.props.name||"Channel "+this.props.id}
-            legend={ltext}
-            rightIcon="timer"
-            onClick={this.onItemClick}
+        let itemProps={
+            caption:this.props.name||"Channel "+this.props.id,
+            legend:ltext,
+            onClick:this.onItemClick
+        };
+        if (this.props.timerSum > 0) {
+            itemProps.rightIcon = <span><FontIcon value="timer"/>
+                <span className="timerSum">{this.props.timerNumber}/{this.props.timerSum}min</span>
+            </span>;
+        }
+        return (<ListItem theme={theme} {...itemProps}
         >
             {this.props.active?
                 <Button label="Stop" raised className="buttonStop" onClick={this.onStop}/>

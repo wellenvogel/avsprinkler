@@ -67,6 +67,7 @@ class ExampleView extends Component {
                 }
             </ListItem>);
         };
+
         return (
             <div className="view exampleView">
                 <ToolBar >
@@ -76,11 +77,21 @@ class ExampleView extends Component {
                     <List>
                         <TimerSwitch active={info.data.timer.running}/>
                         {info.data.channels.outputs.map(function(x){
+                            let timerSum=0;
+                            let timerNumber=0;
+                            info.data.timer.entries.forEach(function(timer){
+                                if (timer.channel===x.channel){
+                                    timerSum+=timer.duration;
+                                    timerNumber+=1;
+                                }
+                            });
                             let props={
                                 name:x.name,
                                 id:x.channel,
                                 time:x.accumulatedTime,
                                 count: x.accumulatedCount,
+                                timerSum: timerSum,
+                                timerNumber:timerNumber,
                                 onStart: self.onStart,
                                 onStop: self.onStop,
                                 onItemClick: self.onItemClick
