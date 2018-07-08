@@ -102,12 +102,14 @@ class Main:
       }
     if request == 'stopTimers':
       self.timers.pause()
+      self.saveTimers()
       return {
         'status': 'OK',
         'data': self.timers.info()
       }
     if request == 'startTimers':
       self.timers.unpause()
+      self.saveTimers()
       return {
         'status': 'OK',
         'data': self.timers.info()

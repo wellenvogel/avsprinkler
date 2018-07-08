@@ -208,13 +208,17 @@ class TimerHandler:
     data=json.loads(cfgStr)
     if clear:
       self.clear()
+    rmode=data.get('running')
+    if rmode is not None:
+      self.running=rmode
     for te in data['timer']:
       newTimer=TimerEntry.parse(te)
       self.addTimer(newTimer)
 
   def toJson(self):
     return json.dumps({
-      'timer':map(lambda t:t.info(),self.timerlist)
+      'timer':map(lambda t:t.info(),self.timerlist),
+      'running': self.running
     })
   def pause(self):
     self.running=False

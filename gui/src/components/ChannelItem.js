@@ -33,7 +33,6 @@ class ChannelItem extends Component{
             rightIcon="timer"
             onClick={this.onItemClick}
         >
-            <div className={statusClass}></div>
             {this.props.active?
                 <Button label="Stop" raised className="buttonStop" onClick={this.onStop}/>
                 :

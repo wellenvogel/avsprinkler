@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import ToolBar from './components/ToolBar';
-import IconButton from 'react-toolbox/lib/button';
 import {List} from 'react-toolbox/lib/list';
 import ChannelItem from './components/ChannelItem';
 import Dialog from 'react-toolbox/lib/dialog';
+import {ListItem} from "react-toolbox/lib/list";
+import {Button, IconButton} from 'react-toolbox/lib/button';
+import TimerSwitchTheme from './style/theme/timerSwitch.less';
 
 
 const urlbase="/control";
@@ -17,6 +19,8 @@ class ExampleView extends Component {
         this.fetchStatus=this.fetchStatus.bind(this);
         this.durationChange=this.durationChange.bind(this);
         this.onItemClick=this.onItemClick.bind(this);
+        this.startTimers=this.startTimers.bind(this);
+        this.stopTimers=this.stopTimers.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -53,6 +57,16 @@ class ExampleView extends Component {
         if (! info.data){
             return (<p>Loading...</p>);
         }
+        let TimerSwitch=function(props) {
+            return (<ListItem caption="Timer Automatik" className="timerSwitch" theme={TimerSwitchTheme}>
+                {props.active?
+                    <Button label="Stop" raised className="buttonStop" onClick={self.stopTimers}/>
+                    :
+                    <Button label="Start" raised className="buttonStart" onClick={self.startTimers}/>
+
+                }
+            </ListItem>);
+        };
         return (
             <div className="view exampleView">
                 <ToolBar >
@@ -60,6 +74,7 @@ class ExampleView extends Component {
                 </ToolBar>
                 <div className="mainDiv">
                     <List>
+                        <TimerSwitch active={info.data.timer.running}/>
                         {info.data.channels.outputs.map(function(x){
                             let props={
                                 name:x.name,
@@ -130,6 +145,12 @@ class ExampleView extends Component {
     }
     onItemClick(channel){
         this.props.history.push("/timer/"+channel);
+    }
+    stopTimers(){
+        this.runCommand("stop timers",urlbase+"?request=stopTimers");
+    }
+    startTimers(){
+        this.runCommand("start timers",urlbase+"?request=startTimers");
     }
 
 }
