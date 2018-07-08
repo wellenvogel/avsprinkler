@@ -64,7 +64,8 @@ class Controller:
     if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
       return {
         'status':'off',
-        'meter': self.hardware.getMeter().getValue()
+        'meter': self.hardware.getMeter().getValue(),
+        'ppl': self.hardware.getMeter().getPPl()
       }
     ch=self.hardware.getOutput(self.activeChannel)
     return {
@@ -78,7 +79,8 @@ class Controller:
         'startCount':ch.getStartCount(),
         'runtime': self.stopTime-ch.getSwitchTime()
       },
-      'meter': self.hardware.getMeter().getValue()
+      'meter': self.hardware.getMeter().getValue(),
+      'ppl': self.hardware.getMeter().getPPl()
     }
 
   def getBaseInfo(self):

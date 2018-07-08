@@ -83,6 +83,7 @@ class ExampleView extends Component {
                                     }
                                 }
                             }
+                            props.ppl=info.data.controller.ppl;
                         return <ChannelItem {...props} />
                     })}
                     </List>

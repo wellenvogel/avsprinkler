@@ -11,17 +11,21 @@ class ChannelItem extends Component{
         this.onStop=this.onStop.bind(this);
         this.onItemClick=this.onItemClick.bind(this);
     }
+    countToL(count){
+        let ppl=this.props.ppl||1;
+        return Math.round(count/ppl);
+    }
     render(){
         let ltext=Math.round(this.props.time/60)+" Min/ ";
         let statusClass="statusOff";
         if (this.props.active){
-            ltext+=this.props.count+this.props.ccount+" P";
+            ltext+=this.countToL(this.props.count+this.props.ccount)+"l";
             ltext+=", on="+Math.round(this.props.running/60)+"/"+Math.round(this.props.runtime/60)+" Min";
-            ltext+=", "+ this.props.ccount+" P";
+            ltext+=", "+ this.countToL(this.props.ccount)+"l";
             statusClass="statusOn"
         }
         else{
-            ltext+=this.props.count+" P";
+            ltext+=this.countToL(this.props.count)+"l";
         }
         return (<ListItem theme={theme}
             caption={this.props.name||"Channel "+this.props.id}

@@ -116,6 +116,9 @@ class Meter(ChannelDevice):
     if cfg is None:
       return
     ChannelDevice.__init__(self, cfg,deadHandler)
+    self.ppl=cfg.get('ppl')
+    if self.ppl is not None:
+      self.ppl=float(self.ppl)
     GPIO.setup(self.getGpio(), GPIO.IN, pull_up_down=GPIO.PUD_UP)
     self.logger.info("setup input at gpio %d" % (self.getGpio()))
     GPIO.add_event_detect(self.getGpio(), GPIO.FALLING, callback=self.meterCallback, bouncetime=50)
@@ -130,6 +133,8 @@ class Meter(ChannelDevice):
     return self.counter
   def setValue(self,v):
     self.counter=v
+  def getPPl(self):
+    return self.ppl
 
 class DeadHandler:
   def __init__(self):

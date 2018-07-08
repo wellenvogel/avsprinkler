@@ -4,7 +4,7 @@
       {
         "channel": 1,
         "gpio": 10,
-        "name": "Aussen rechts"
+        "name": "Schlauch rechts"
       },
       {
         "channel": 2,
@@ -23,7 +23,8 @@
       },
       {
         "channel": 5,
-        "gpio": 8
+        "gpio": 8,
+        "name": "Schlauch links(vorn)"
       },
       {
         "channel": 6,
@@ -62,7 +63,9 @@
     ],
     "meter":{
       "gpio":24,
-      "channel":0
+      "channel":0,
+      "ppl":65
+
     }
 
   }
