@@ -8,7 +8,7 @@ import TimerDialog from './components/TimerEdit';
 
 
 const urlbase="/control";
-class TimerView extends Component {
+class TimerListView extends Component {
 
     constructor(props){
         super(props);
@@ -33,10 +33,6 @@ class TimerView extends Component {
             self.setState(jsonData||{});
         })
     }
-    getChannel(){
-        let ch=this.props.match.params.channel||1;
-        if (ch !== undefined) return parseInt(ch);
-    }
     getChannelInfo(channel){
         if (! this.state.data) return;
         let channels=this.state.data.channels.outputs;
@@ -46,15 +42,27 @@ class TimerView extends Component {
             if (cdata.channel === channel) return cdata;
         }
     }
-    getTimers(channel){
+    startToDate(start){
+        let hhmm=start.split(':');
+        let d=new Date();
+        d.setHours(hhmm[0]);
+        d.setMinutes(hhmm[1]);
+        return d;
+    }
+    getTimers(){
+        let self=this;
         if (! this.state.data) return;
         let tlist=this.state.data.timer.entries;
         if (! tlist) return;
         let rt=[];
         for (let i=0;i<tlist.length;i++){
             let te=tlist[i];
-            if (te.channel === channel) rt.push(te)
+            rt.push(te)
         }
+        rt.sort(function(x,y){
+           if ( x.weekday !== y.weekday) return x.weekday - y.weekday;
+           return self.startToDate(x.start) - self.startToDate(y.start)
+        });
         return rt;
     }
     componentDidMount(){
@@ -68,33 +76,24 @@ class TimerView extends Component {
     render() {
         let self=this;
         let info=this.state;
-        let title=info.title||"TimerView";
-        if (info.data){
-            let cinfo=this.getChannelInfo(this.getChannel());
-            if (cinfo){
-                title="Timer "+cinfo.name
-            }
-        }
-        let timers=this.getTimers(this.getChannel());
+        let title="Timer Liste";
+        let timers=this.getTimers();
         let dialogProps={
             dialogVisible:this.state.dialogVisible,
-            dialogChannel:this.getChannel(),
+            dialogChannel:this.state.dialogChannel,
             dialogStart: this.state.dialogStart,
             dialogWeekday: this.state.dialogWeekday,
             dialogDuration: this.state.dialogDuration,
             dialogTimerId: this.state.dialogTimerId,
+            dialogTitle: this.state.dialogTitle,
             hideCallback: this.hideDialog,
-            callback: function(tp){self.setState({dialogDuration:tp.dialogDuration});self.fetchStatus();}
+            callback: function(tp){self.fetchStatus();}
 
         };
         return (
             <div className="view timerView">
                 <ToolBar leftIcon="arrow_back"
-                         leftClick={this.goBack}
-                         rightIcon="timer" onRightIconClick={
-                            function(){
-                                self.props.history.push("/timerlist/");
-                            }}>
+                         leftClick={this.goBack}>
                     <span className="toolbar-label">{title}</span>
                     <span className="spacer"/>
                 </ToolBar>
@@ -102,14 +101,14 @@ class TimerView extends Component {
                     <List>
                         {timers ?
                             timers.map(function (te) {
-                                return <TimerEntry {...te} onItemClick={self.onItemClick}/>
+                                let ti=self.getChannelInfo(te.channel);
+                                return <TimerEntry {...te}  channelName={ti.name} onItemClick={self.onItemClick}/>
                             })
                             :
                             <p>Loading...</p>
                         }
                     </List>
                 </div>
-                <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
                 {this.state.dialogVisible ?
                     <TimerDialog {...dialogProps}></TimerDialog>
                     :
@@ -132,9 +131,12 @@ class TimerView extends Component {
             dialogWeekday:te.weekday,
             dialogStart:te.start,
             dialogDuration:te.duration,
-            dialogActions:this.dialogEditActions
+            dialogChannel:te.channel,
+            dialogActions:this.dialogEditActions,
+            dialogTitle:this.getChannelInfo(te.channel).name
         });
     }
+    //TODO: do we want plus here?
     onPlus(){
         this.setState({
             dialogVisible:true,
@@ -148,4 +150,4 @@ class TimerView extends Component {
 }
 
 
-export default TimerView;
+export default TimerListView;

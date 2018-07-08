@@ -6,6 +6,7 @@ import {
 
 import MainView from './MainView';
 import TimerView from './TimerView';
+import ListView from './TimerListView';
 class App extends Component {
   render() {
     return (
@@ -14,6 +15,7 @@ class App extends Component {
                 <Route exact path="/" component={MainView}/>
                 <Route path="/overview" component={MainView}/>
                 <Route path="/timer/:channel" component={TimerView}/>
+                <Route path="/timerlist/" component={ListView}/>
             </div>
         </Router>
     );

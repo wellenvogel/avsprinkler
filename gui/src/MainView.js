@@ -70,7 +70,11 @@ class ExampleView extends Component {
 
         return (
             <div className="view exampleView">
-                <ToolBar >
+                <ToolBar rightIcon="timer" onRightIconClick={
+                    function(){
+                        self.props.history.push("/timerlist/");
+                    }
+                }>
                     <span className="toolbar-label">{title}</span>
                 </ToolBar>
                 <div className="mainDiv">

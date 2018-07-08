@@ -15,8 +15,10 @@ class TimerEntry extends Component{
        return weekdays[wd];
     }
     render(){
+        let name="";
+        if (this.props.channelName !== undefined) name=": "+this.props.channelName;
         return (<ListItem theme={theme}
-            caption={this.weekdayToString(this.props.weekday)+", "+this.props.start}
+            caption={this.weekdayToString(this.props.weekday)+", "+this.props.start+name}
             legend={"Dauer: "+this.props.duration+" Minuten"}
             onClick={this.onItemClick}
         >

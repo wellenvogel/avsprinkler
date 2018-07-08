@@ -16,6 +16,10 @@ class ToolBar extends Component {
             props.leftIcon=this.props.leftIcon;
             props.onLeftIconClick=this.leftClick;
         }
+        if (this.props.rightIcon){
+            props.rightIcon=this.props.rightIcon;
+            props.onRightIconClick=this.props.onRightIconClick;
+        }
         let self=this;
         return (
             <AppBar {...props}>
