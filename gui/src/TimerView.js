@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import ToolBar from './components/ToolBar';
-import IconButton from 'react-toolbox/lib/button';
+import Button from 'react-toolbox/lib/button';
 import TimerEntry from './components/TimerEntry';
 import {List} from 'react-toolbox/lib/list';
+import ButtonTheme from './style/theme/fabButton.less';
 
 
 const urlbase="/control";
@@ -14,6 +15,7 @@ class TimerView extends Component {
         this.goBack=this.goBack.bind(this);
         this.fetchStatus=this.fetchStatus.bind(this);
         this.onItemClick=this.onItemClick.bind(this);
+        this.onPlus=this.onPlus.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -108,6 +110,7 @@ class TimerView extends Component {
                         }
                     </List>
                 </div>
+                <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
             </div>
         );
     }
@@ -116,6 +119,9 @@ class TimerView extends Component {
     }
     onItemClick(te){
         console.log("item click");
+    }
+    onPlus(){
+        console.log("plus clicked")
     }
 }
 
