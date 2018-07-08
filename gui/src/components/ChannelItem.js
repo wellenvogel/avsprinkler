@@ -12,12 +12,16 @@ class ChannelItem extends Component{
         this.onItemClick=this.onItemClick.bind(this);
     }
     render(){
-        let ltext="gesamt: "+Math.round(this.props.time/60)+" Minuten";
+        let ltext=Math.round(this.props.time/60)+" Min/ ";
         let statusClass="statusOff";
         if (this.props.active){
-            ltext+=", Laufzeit noch "+Math.round(this.props.remain/60)+" Minuten";
-            ltext+=", Impulse="+this.props.count;
+            ltext+=this.props.count+this.props.ccount+" P";
+            ltext+=", on="+Math.round(this.props.running/60)+"/"+Math.round(this.props.runtime/60)+" Min";
+            ltext+=", "+ this.props.ccount+" P";
             statusClass="statusOn"
+        }
+        else{
+            ltext+=this.props.count+" P";
         }
         return (<ListItem theme={theme}
             caption={this.props.name||"Channel "+this.props.id}

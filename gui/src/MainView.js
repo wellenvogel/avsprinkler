@@ -77,7 +77,8 @@ class ExampleView extends Component {
                                         props.start=new Date(cc.started*1000);
                                         props.running=cc.running;
                                         props.remain=cc.remain;
-                                        props.count=info.data.controller.meter-cc.startCount||0;
+                                        props.runtime=cc.runtime;
+                                        props.ccount=info.data.controller.meter-cc.startCount||0;
                                     }
                                 }
                             }
