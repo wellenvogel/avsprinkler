@@ -27,7 +27,7 @@ class TimerEdit extends Component {
                 url=self.addParametersToUrl(url);
                 url+="&id="+encodeURIComponent(self.state.dialogTimerId);
                 self.runCommand("Update Timer",url);
-                self.hideDialog();props
+                self.hideDialog();
             }}
         ];
         this.dialogNewActions=[];
