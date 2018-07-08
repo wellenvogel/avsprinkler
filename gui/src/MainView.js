@@ -15,6 +15,7 @@ class ExampleView extends Component {
         this.onStop=this.onStop.bind(this);
         this.fetchStatus=this.fetchStatus.bind(this);
         this.durationChange=this.durationChange.bind(this);
+        this.onItemClick=this.onItemClick.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -56,6 +57,7 @@ class ExampleView extends Component {
                 <ToolBar >
                     <span className="toolbar-label">{title}</span>
                 </ToolBar>
+                <div className="mainDiv">
                     <List>
                         {info.data.channels.outputs.map(function(x){
                             let props={
@@ -64,7 +66,8 @@ class ExampleView extends Component {
                                 time:x.accumulatedTime,
                                 count: x.accumulatedCount,
                                 onStart: self.onStart,
-                                onStop: self.onStop
+                                onStop: self.onStop,
+                                onItemClick: self.onItemClick
                             };
                             if (info.data.controller.status === 'on'){
                                 if (info.data.controller.channel){
@@ -78,9 +81,10 @@ class ExampleView extends Component {
                                     }
                                 }
                             }
-                        return <ChannelItem {...props}/>
+                        return <ChannelItem {...props} />
                     })}
                     </List>
+                </div>
                 <Dialog actions={dialogActions}
                 active={this.state.dialogVisible}
                 title={"Starte Kanal "+self.state.channel}>
@@ -120,6 +124,9 @@ class ExampleView extends Component {
     }
     onStop(channel){
         this.runCommand("stop",urlbase+"?request=stop");
+    }
+    onItemClick(channel){
+        this.props.history.push("/timer/"+channel);
     }
 
 }

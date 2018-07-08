@@ -12,8 +12,8 @@ class App extends Component {
         <Router>
             <div className="main">
                 <Route exact path="/" component={MainView}/>
-                <Route path="/first" component={MainView}/>
-                <Route path="/second/" component={TimerView}/>
+                <Route path="/overview" component={MainView}/>
+                <Route path="/timer/:channel" component={TimerView}/>
             </div>
         </Router>
     );
