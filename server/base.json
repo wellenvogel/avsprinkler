@@ -18,7 +18,8 @@
       },
       {
         "channel": 4,
-        "gpio": 11
+        "gpio": 11,
+        "name": "Carport"
       },
       {
         "channel": 5,

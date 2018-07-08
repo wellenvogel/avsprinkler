@@ -26,6 +26,7 @@ class TimerEntry:
     self.start=start
     self.duration=duration
     self.lastRun=None
+    self.id=None
 
   @classmethod
   def parse(cls,map):
@@ -110,7 +111,8 @@ class TimerEntry:
       'channel':self.channel,
       'weekday':self.weekday,
       'start':self.start,
-      'duration':self.duration
+      'duration':self.duration,
+      'id':self.id if self.id is not None else 0
     }
 
 

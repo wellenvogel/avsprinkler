@@ -73,7 +73,7 @@ class Main:
         'status': 'OK',
         'data': self.timers.info()
       }
-    if request == 'addTimer':
+    if request == 'addTimer' or request == 'updateTimer':
       rq=['channel','start','weekday','duration']
       map={}
       for r in rq:
@@ -85,7 +85,16 @@ class Main:
       map['channel']=int(map['channel'])
       map['weekday']=int(map['weekday'])
       te=timerh.TimerEntry.parse(map)
-      self.timers.addTimer(te)
+      id = self.getHttpRequestParam(param, 'id')
+      if id is not None:
+        id = int(id)
+        if id != 0:
+          te.id=id
+          self.timers.updateTimerWithId(te)
+        else:
+          self.timers.addTimer(te)
+      else:
+        self.timers.addTimer(te)
       self.saveTimers()
       return {
         'status': 'OK',

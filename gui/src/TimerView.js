@@ -79,22 +79,43 @@ class TimerView extends Component {
         }
         return rt;
     }
+    addParametersToUrl(url){
+       url+="channel="+encodeURIComponent(this.getChannel());
+       url+="&start="+encodeURIComponent(this.state.dialogStart);
+       url+="&weekday="+encodeURIComponent(this.state.dialogWeekday);
+       url+="&duration="+encodeURIComponent(this.state.dialogDuration);
+       return url;
+    }
     componentDidMount(){
         let self=this;
         this.interval=setInterval(this.fetchStatus,2000);
         this.fetchStatus();
         this.dialogEditActions=[
             {label:'Löschen',onClick:function(){
+                let url=urlbase+"?request=clearTimer&";
+                url=self.addParametersToUrl(url);
+                self.runCommand("Lösche Timer",url);
                 self.hideDialog();
             }},
             {label:'Abbrechen',onClick:self.hideDialog},
             {label:'Ok',onClick:function(){
+                let url=urlbase+"?request=updateTimer&";
+                url=self.addParametersToUrl(url);
+                url+="&id="+encodeURIComponent(self.state.dialogTimerId);
+                self.runCommand("Update Timer",url);
                 self.hideDialog();
             }}
         ];
         this.dialogNewActions=[];
         this.dialogNewActions.push(this.dialogEditActions[1]);
-        this.dialogNewActions.push(this.dialogEditActions[2]);
+        this.dialogNewActions.push(
+            {label:'Ok',onClick:function(){
+                let url=urlbase+"?request=addTimer&";
+                url+=self.addParametersToUrl(url);
+                self.runCommand("Add Timer",url);
+                self.hideDialog();
+            }}
+        );
     }
     componentWillUnmount(){
         clearInterval(this.interval);
@@ -104,9 +125,9 @@ class TimerView extends Component {
         let info=this.state;
         let title=info.title||"TimerView";
         if (info.data){
-            let cinfo=this.getChannelInfo(this.getChannel())
+            let cinfo=this.getChannelInfo(this.getChannel());
             if (cinfo){
-                title=cinfo.name
+                title="Timer "+cinfo.name
             }
         }
         let timers=this.getTimers(this.getChannel());
@@ -161,6 +182,7 @@ class TimerView extends Component {
     onItemClick(te){
         this.setState({
             dialogVisible:true,
+            dialogTimerId:te.id,
             dialogWeekday:te.weekday,
             dialogStart:te.start,
             dialogDuration:te.duration,
@@ -170,6 +192,7 @@ class TimerView extends Component {
     onPlus(){
         this.setState({
             dialogVisible:true,
+            dialogTimerId:0,
             dialogWeekday:0,
             dialogStart:"06:00",
             dialogDuration:15,

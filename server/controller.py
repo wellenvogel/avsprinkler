@@ -75,7 +75,8 @@ class Controller:
         'started':ch.getSwitchTime(),
         'running':time.time()-ch.getSwitchTime(),
         'remain': (self.stopTime - time.time()) if self.stopTime is not None else 0,
-        'startCount':ch.getStartCount()
+        'startCount':ch.getStartCount(),
+        'runtime': self.stopTime-ch.getSwitchTime()
       },
       'meter': self.hardware.getMeter().getValue()
     }
