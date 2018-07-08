@@ -7,6 +7,7 @@ import json
 import os
 import time
 import threading
+import history
 
 DEFAULT_RUNTIME=15*60
 
@@ -24,6 +25,8 @@ class Controller:
     self.timerThread=threading.Thread(target=self.timerRun)
     self.timerThread.daemon=True
     self.timerThread.start()
+    self.history=history.History(os.path.join(basedir,"history.txt"))
+    self.history.readEntries()
     for ch in range(0, 7):
       self.hardware.getInput(ch).registerCallback(self.__cb)
   def getStatusFileName(self):
@@ -32,9 +35,26 @@ class Controller:
     if self.activeChannel is None:
       return
     self.logger.info("switching off %d"%(self.activeChannel))
+    ch = self.hardware.getOutput(self.activeChannel)
+    startTime=None
+    startCount=None
+    if ch is not None:
+      startTime=ch.getAccumulatedTime()
+      startCount=ch.getAccumulatedCount()
     self.hardware.stopOutput(self.activeChannel)
+    channel=self.activeChannel
     self.activeChannel=None
     self.writeStatus()
+    if ch is None:
+      return
+    hentry="STOP,%d,%s,%d,%d" %(ch.getChannel(),
+                           ch.getName(),
+                           ch.getAccumulatedTime(),
+                           round(ch.getAccumulatedCount() / self.hardware.getMeter().getPPl()))
+    if startCount is not None and startTime is not None:
+      hentry+=",%d,%d"%(ch.getAccumulatedTime()-startTime,
+                        round((ch.getAccumulatedCount()-startCount)/self.hardware.getMeter().getPPl()))
+    self.history.addEntry(hentry)
   def __cb(self,channel):
     if channel == 0:
       self.stop()
@@ -58,7 +78,13 @@ class Controller:
     self.logger.info("switching on %d till %s"%(channel, time.ctime(self.stopTime)))
     self.activeChannel=channel
     self.hardware.startOutput(channel)
+    ch=self.hardware.getOutput(channel)
     self.writeStatus()
+    self.history.addEntry("START,%d,%s,%d,%d"%
+                          (channel,
+                           ch.getName(),
+                           ch.getAccumulatedTime(),
+                           int(ch.getAccumulatedCount()/self.hardware.getMeter().getPPl())))
 
   def getStatus(self):
     if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
@@ -124,6 +150,9 @@ class Controller:
         self.setPersistanceInfo(json.loads(status))
     except:
       self.logger.warn("execption in read status")
+
+  def getHistory(self):
+    return self.history.getEntries()
 
   def timerRun(self):
     while True:

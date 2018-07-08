@@ -69,6 +69,8 @@ class Output(ChannelDevice):
     return self.switchTime
   def getAccumulatedCount(self):
     return self.accumulatedCount
+  def getAccumulatedTime(self):
+    return self.accumulated
   def getStartCount(self):
     return self.startcount
   def info(self):

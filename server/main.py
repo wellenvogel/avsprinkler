@@ -114,6 +114,12 @@ class Main:
         'status': 'OK',
         'data': self.timers.info()
       }
+    if request == 'history':
+      history=self.controller.getHistory()
+      return{
+        'status':'OK',
+        'data':history
+      }
     return {
       'status':'ERROR',
       'info':'not found'
