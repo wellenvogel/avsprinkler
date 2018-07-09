@@ -42,9 +42,13 @@ class HistoryView extends Component {
             let dtkind=param[0].split('-');
             if (dtkind[1] !== "STOP") return;
             let re={};
+            re.datev=new Date(dtkind[0]);
             re.date=dtkind[0];
             re.info=param[2]+": "+Math.round(param[5]/60)+"min, "+param[6]+"l (Sum: "+Math.round(param[3]/60)+"min/ "+param[4]+"l)";
             rt.push(re);
+        });
+        rt.sort(function(x,y){
+            return y.datev - x.datev;
         });
         return rt;
     }
