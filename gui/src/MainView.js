@@ -58,7 +58,7 @@ class ExampleView extends Component {
             return (<p>Loading...</p>);
         }
         let TimerSwitch=function(props) {
-            return (<ListItem caption="Timer Automatik" className="timerSwitch" theme={TimerSwitchTheme}>
+            return (<ListItem caption="Timer Automatik" className="timerSwitch" theme={TimerSwitchTheme} legend={props.sum+"l"}>
                 {props.active?
                     <Button label="Stop" raised className="buttonStop" onClick={self.stopTimers}/>
                     :
@@ -78,7 +78,7 @@ class ExampleView extends Component {
                 </ToolBar>
                 <div className="mainDiv">
                     <List>
-                        <TimerSwitch active={info.data.timer.running}/>
+                        <TimerSwitch active={info.data.timer.running} sum={Math.round(info.data.controller.meter/info.data.controller.ppl||1)}/>
                         {info.data.channels.outputs.map(function(x){
                             let timerSum=0;
                             let timerNumber=0;
