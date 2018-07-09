@@ -66,6 +66,11 @@
       "channel":0,
       "ppl":65
 
+    },
+    "booster":{
+      "gpio":22,
+      "channel":99,
+      "time":20
     }
 
   }

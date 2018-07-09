@@ -1,4 +1,5 @@
 import logging
+import threading
 
 import RPi.GPIO as GPIO
 import json
@@ -51,7 +52,7 @@ class Output(ChannelDevice):
     self.switchTime=time.time()
     self.startcount=count
     if self.deadHandler is not None:
-      self.deadHandler.switch()
+      self.deadHandler.switchOn()
     GPIO.output(self.getGpio(),ON_OUT)
   def switchOff(self,count=0):
     if not self.isOn():
@@ -60,7 +61,7 @@ class Output(ChannelDevice):
     self.accumulated+=now-self.switchTime
     self.accumulatedCount+=count-self.startcount
     if self.deadHandler is not None:
-      self.deadHandler.switch()
+      self.deadHandler.switchOff()
     GPIO.output(self.getGpio(),DEFAULT_OUT)
     self.switchTime=None
     self.startcount=0
@@ -138,9 +139,41 @@ class Meter(ChannelDevice):
   def getPPl(self):
     return self.ppl
 
+class Booster(Output):
+  def __init__(self,cfg,deadHandler):
+    Output.__init__(self,cfg,deadHandler)
+    self.timerThread = threading.Thread(target=self.timerRun)
+    self.timerThread.daemon = True
+    self.timerThread.start()
+    self.stopTime=None
+    self.boosterTime=cfg.get("time") if cfg is not None else None
+    if self.boosterTime is None:
+      self.boosterTime=30
+    else:
+      self.boosterTime=int(self.boosterTime)
+  def timerRun(self):
+    while True:
+      try:
+        if self.stopTime is not None:
+          now=time.time()
+          if now >= self.stopTime:
+            self.logger.info("booster off")
+            self.switchOff(0)
+            self.stopTime=None
+      except :
+        self.logger.warn("Exception in booster timer")
+      time.sleep(1)
+
+  def switchOn(self,count=0):
+    Output.switchOn(self,count)
+    self.stopTime=time.time()+self.boosterTime
+    self.logger.info("booster on")
+
+
 class DeadHandler:
-  def __init__(self):
+  def __init__(self,booster=None):
     self.last=None
+    self.booster=booster
 
   def isDeadTime(self):
     if self.last is None:
@@ -149,15 +182,20 @@ class DeadHandler:
     if (now-self.last) < DEAD_TIME:
       return True
     return False
-  def switch(self):
+  def switchOn(self):
     self.last=time.time()
+    if self.booster is not None:
+      self.booster.switchOn(0)
+  def switchOff(self):
+    self.last = time.time()
 
 class Hardware:
   def __init__(self):
     configString = open(os.path.join(basedir, "base.json")).read()
     self.config = json.loads(configString)
     GPIO.setmode(GPIO.BCM)
-    self.deadHandler=DeadHandler()
+    self.booster = Booster(self.config['gpio'].get('booster'),None)
+    self.deadHandler=DeadHandler(self.booster)
     self.outputs = self.createOutputs()
     self.inputs = self.createInputs()
     self.meter = Meter(self.config['gpio'].get('meter'),self.deadHandler)
