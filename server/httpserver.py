@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import posixpath
+import re
 import traceback
 import urllib
 import urlparse
@@ -133,7 +134,11 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
     self.end_headers()
     return f
-
+  def isForwarded(self):
+    fh=self.headers.getheaders("x-forwarded-for")
+    if fh is None or len(fh) == 0:
+      return False
+    return True
   # overwrite this from SimpleHTTPRequestHandler
   def translate_path(self, path):
     """Translate a /-separated PATH to the local filename syntax.
@@ -167,8 +172,19 @@ class HTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       path = os.path.join(path, word)
     self.logger.debug("request path/query", path, query)
     # pathmappings expect to have absolute pathes!
-    return os.path.join(self.server.basedir, path)
-
+    rtPath=os.path.join(self.server.basedir, path)
+    #special handling for forwarded requests
+    if self.isForwarded():
+      translates=["^[/]*index.html$","^[/]*manifest.json$","^[/]*favicon.ico$","^[/]*icon.png$"]
+      for tr in translates:
+        trname=re.sub("(\\.[^.]*)$","Ext\\1",path)
+        if re.match(tr,path) is not None:
+          tryPath=os.path.join(self.server.basedir,trname)
+          if os.path.exists(tryPath):
+            return tryPath
+          else:
+            return rtPath
+    return rtPath
 
 
   # send a json encoded response
