@@ -1,0 +1,53 @@
+Teileliste Sprinkler-Hardware
+
+Steuerung
+==========
+
+Raspberry Pi Model B (Rpi 1)
+WLAN-Adapter
+
+8-Kanal-Relais-Modul, Optokoppler, 3,3V/5V
+https://www.ebay.de/itm/352027331089 Kt-Elektronik 7,80€
+
+Spannungsregler 1,5-35V einstellbar
+https://www.ebay.de/itm/351018565039 Kt-Elektronik 5,75€
+
+
+Reichelt:
+Hall-Sensor SS413A für Austausch defekter im Durchflussgeber 1,15€
+MeanWell LED Netzteil APV12-5 5V,2000mA 6,30€
+MeanWell LED Netzteil APV-16-24 24V, 670mA 6,45€
+
+TME:
+HM1598JSGY Gehäuse 14,46€
+LIYY-10X0.25 Kabel 10Pol 10m 11,50€
+IEC-A-4 230V Steckverbinder 0,48€
+PS12BBK Taster 7x 2,53€
+SP2113/P12 Buchse 12pol 4,97€
+SP2110/S12IIC Stecker 12pol 5,43€
+IND8-12G-B LED Leuchte 7x 4,36€
+
+Verbindungskabel (Buchse-Buchse)
+div. Widerstände
+
+
+Ventile(6 Stück)
+========
+Rain Magnetventil glasfaserverstärktes Nylon Innengewinde 10bar Schwarz 24VAC 3/4" 110 RN150
+https://www.liquipipe.de/ je 16,73€
+
+Waschmaschinen-Anschluss mit Wasserstop
+https://www.amazon.de/dp/B078WX8PZP/ref=pe_3044161_185740101_TE_item 19,95€
+
+T-Stücke, Doppelnippel PE 3,4"
+RST-Versand 13,-€, 13,-€
+
+Durchflussgeber 3/4"
+https://www.amazon.de/dp/B00EXGC6TA/ref=pe_3044161_189395811_TE_3p_dp_1 8,99€
+Achtung: Hallgeber defekt, Austausch durch SS413A, umgebaut auf OpenCollector
+
+Gardena Maschinen-Anschluss 6x (AG 3/4 ")  ca. 15,-€
+
+Feuchtraumdose
+
+Gehäuse: Siebdruckplatten 9mm
