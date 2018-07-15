@@ -28,7 +28,8 @@
       },
       {
         "channel": 6,
-        "gpio": 7
+        "gpio": 7,
+        "name":"Blauer Schlauch"
       }
     ],
     "inputs": [
@@ -64,7 +65,7 @@
     "meter":{
       "gpio":24,
       "channel":0,
-      "ppl":65
+      "ppl":115
 
     },
     "booster":{
