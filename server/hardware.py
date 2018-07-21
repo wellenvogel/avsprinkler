@@ -58,8 +58,9 @@ class Output(ChannelDevice):
     if not self.isOn():
       return False
     now=time.time()
-    self.accumulated+=now-self.switchTime
-    self.accumulatedCount+=count-self.startcount
+    if self.switchTime is not None:
+      self.accumulated+=now-self.switchTime
+      self.accumulatedCount+=count-self.startcount
     if self.deadHandler is not None:
       self.deadHandler.switchOff()
     GPIO.output(self.getGpio(),DEFAULT_OUT)
@@ -264,3 +265,16 @@ class Hardware:
     if not ch:
       return False
     return ch.isOn()
+
+  def getInputChannelNumbers(self):
+    rt=[]
+    for c in self.inputs:
+      rt.append(c.getChannel())
+    return rt
+
+  def getOutputChannelNumbers(self):
+    rt=[]
+    for c in self.outputs:
+      rt.append(c.getChannel())
+    return rt
+

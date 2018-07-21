@@ -27,7 +27,7 @@ class Controller:
     self.timerThread.start()
     self.history=history.History(os.path.join(basedir,"history.txt"))
     self.history.readEntries()
-    for ch in range(0, 7):
+    for ch in self.hardware.getInputChannelNumbers():
       self.hardware.getInput(ch).registerCallback(self.__cb)
   def getStatusFileName(self):
     return os.path.join(basedir,"status.json")
@@ -157,10 +157,19 @@ class Controller:
   def timerRun(self):
     while True:
       try:
+        #do some audit as the "on" events could occur asynchronously
+        #and in parallel - so we check for only one active output
+        for cn in self.hardware.getOutputChannelNumbers():
+          if self.activeChannel is None or cn != self.activeChannel:
+            #we can safely call stop here as this will check first if the channel is running
+            self.hardware.stopOutput(cn)
+      except:
+        pass
+      try:
         if self.activeChannel is not None and self.stopTime is not None:
           now=time.time()
           if now >= self.stopTime:
             self.stop()
-        time.sleep(1)
       except:
         self.logger.warn("Exception in timerloop")
+      time.sleep(1)
