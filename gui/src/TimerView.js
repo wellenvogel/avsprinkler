@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ToolBar from './components/ToolBar';
-import Button from 'react-toolbox/lib/button';
+import {Button,IconButton} from 'react-toolbox/lib/button';
 import TimerEntry from './components/TimerEntry';
 import {List} from 'react-toolbox/lib/list';
 import ButtonTheme from './style/theme/fabButton.less';
@@ -90,13 +90,13 @@ class TimerView extends Component {
         return (
             <div className="view timerView">
                 <ToolBar leftIcon="arrow_back"
-                         leftClick={this.goBack}
-                         rightIcon="timer" onRightIconClick={
-                            function(){
-                                self.props.history.push("/timerlist/");
-                            }}>
+                         leftClick={this.goBack}>
                     <span className="toolbar-label">{title}</span>
                     <span className="spacer"/>
+                    <span className="rightButtons">
+                        <IconButton icon="history" onClick={function() {self.props.history.push("/history/"+self.getChannel());}}/>
+                        <IconButton icon="timer" onClick={function() {self.props.history.push("/timerlist/");}}/>
+                    </span>
                 </ToolBar>
                 <div className="mainDiv">
                     <List>
@@ -141,7 +141,7 @@ class TimerView extends Component {
             dialogTimerId:0,
             dialogWeekday:0,
             dialogStart:"06:00",
-            dialogDuration:this.state.dialogDuration||15,
+            dialogDuration:this.state.dialogDuration||20,
             dialogActions:this.dialogNewActions
         });
     }

@@ -17,6 +17,7 @@ class App extends Component {
                 <Route path="/overview" component={MainView}/>
                 <Route path="/timer/:channel" component={TimerView}/>
                 <Route path="/timerlist/" component={ListView}/>
+                <Route path="/history/:channel" component={HistoryView}/>
                 <Route path="/history/" component={HistoryView}/>
             </div>
         </Router>

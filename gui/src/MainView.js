@@ -121,7 +121,7 @@ class ExampleView extends Component {
                 active={this.state.dialogVisible}
                 title={"Starte Kanal "+self.state.channel}>
                     <p>Laufzeit(Minuten)</p>
-                    <input type="number"  value={self.state.duration||15} onChange={self.durationChange}/>
+                    <input type="number"  value={self.state.duration||20} onChange={self.durationChange}/>
                 </Dialog>
 
             </div>
