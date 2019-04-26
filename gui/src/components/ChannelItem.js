@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {ListItem} from 'react-toolbox/lib/list'
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import theme from '../style/theme/listItem.less'
+import baseTheme from 'react-toolbox/lib/list/theme.css';
 import FontIcon from 'react-toolbox/lib/font_icon';
 
 class ChannelItem extends Component{
@@ -28,26 +29,34 @@ class ChannelItem extends Component{
         else{
             ltext+=this.countToL(this.props.count)+"l";
         }
-        let itemProps={
-            caption:this.props.name||"Channel "+this.props.id,
-            legend:ltext,
-            onClick:this.onItemClick
-        };
-        if (this.props.timerSum > 0) {
-            itemProps.rightIcon = <span><FontIcon value="timer"/>
-                <span className="timerSum">{this.props.timerNumber}/{this.props.timerSum}min</span>
-            </span>;
-        }
-        return (<ListItem theme={theme} {...itemProps}
-        >
+        let caption=this.props.name||"Channel "+this.props.id;
+        return (
+        <div className={"channelItem " + baseTheme.listItem + " "+baseTheme.item}>
+            <span className={baseTheme.itemAction}>
             {this.props.active?
                 <Button label="Stop" raised className="buttonStop" onClick={this.onStop}/>
                 :
                 <Button label="Start" raised className="buttonStart" onClick={this.onStart}/>
 
             }
+                </span>
+            <div className="rightField" onClick={this.onItemClick}>
+                <div className="info">
+                    <span className={baseTheme.itemText + " " + baseTheme.primary + " "+theme.itemText}>{caption}</span>
+                    <span class="info">{ltext}</span>
 
-        </ListItem>);
+                </div>
+                <div className="timerInfo">
+                    {this.props.timerSum > 0?
+                        <span><FontIcon value="timer"/>
+                        <span className="timerSum">{this.props.timerNumber}/{this.props.timerSum}min</span>
+                    </span>
+                        :null
+                    }
+                </div>
+            </div>
+
+        </div>);
     }
     onStart(){
         if (this.props.onStart) this.props.onStart(this.props.id);

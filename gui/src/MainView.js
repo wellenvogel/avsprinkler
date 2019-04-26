@@ -6,14 +6,14 @@ import Dialog from 'react-toolbox/lib/dialog';
 import {ListItem} from "react-toolbox/lib/list";
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import TimerSwitchTheme from './style/theme/timerSwitch.less';
-
+import assign from 'object-assign';
 
 const urlbase="/control";
 class ExampleView extends Component {
 
     constructor(props){
         super(props);
-        this.state=props;
+        this.state=assign({},props,{duration:20});
         this.onStart=this.onStart.bind(this);
         this.onStop=this.onStop.bind(this);
         this.fetchStatus=this.fetchStatus.bind(this);
@@ -49,7 +49,7 @@ class ExampleView extends Component {
         let dialogActions=[
             {label:"Abbrechen",onClick: function(){self.setState({dialogVisible:false})}},
             {label:"OK",onClick: function(){
-                self.runCommand("start",urlbase+"?request=start&channel="+self.state.channel+"&duration="+(self.state.duration||15)*60);
+                self.runCommand("start",urlbase+"?request=start&channel="+self.state.channel+"&duration="+(self.state.duration||20)*60);
                 self.setState({dialogVisible:false});
             }}
         ];

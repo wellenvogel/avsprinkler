@@ -1,6 +1,6 @@
 const path=require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var isProduction=(process.env.NODE_ENV === 'production') || (process.argv.indexOf('-p') !== -1);
 
 let outdir="debug";
@@ -27,7 +27,7 @@ module.exports = function(env) {
         module: {
             rules: [
                 {
-                    test: /\.js$/,
+                    test: /\.(js|jsx)$/,
                     exclude: /node_modules/,
                     use: [
                         'babel-loader',
@@ -36,6 +36,22 @@ module.exports = function(env) {
                 {
                     test: /\.json$/,
                     use: [ 'json-loader']
+                },
+                {
+                    test: /style\/icons\/.*/,
+                    loader: 'file-loader',
+                    query:{
+                        outputPath: './icons',
+                        name: '[name].[ext]'
+                        }
+                },
+                {
+                    test: /style\/fonts\/.*/,
+                    loader: 'file-loader',
+                    query:{
+                        outputPath: './fonts',
+                        name: '[name].[ext]'
+                    }
                 },
                 {
                     test: /node_modules.react-toolbox.*\.css$/,
@@ -54,10 +70,7 @@ module.exports = function(env) {
                             loader: 'postcss-loader',
                             options: {
                                 config: {},
-                                ident: 'postcss',
-                                plugins: (loader) =>[
-                                    require('postcss-cssnext')()
-                                ]
+                                ident: 'postcss'
                             }
                         }
                     ]
@@ -66,13 +79,26 @@ module.exports = function(env) {
                 {
                     test: /\.css$/,
                     exclude: /node_modules.react-toolbox/,
-                    use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+                    use: [{
+                        loader: MiniCssExtractPlugin.loader
+                        },
+                        'css-loader']
                 },
 
                 {
                     test: /\.less$/,
                     exclude: /theme..*less/,
-                    use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader?-url!less-loader"})
+                    use: [
+                        {
+                            loader: MiniCssExtractPlugin.loader
+                        },
+                        "css-loader",
+                        {
+                            loader:"less-loader",
+                            options:{
+                                javascriptEnabled:true
+                            }
+                        }]
                 },
                 {
                     test: /theme.*\.less$/,
@@ -86,8 +112,12 @@ module.exports = function(env) {
                                 localIdentName: "[name]--[local]--[hash:base64:8]"
                             }
                         },
-                        'less-loader'
-
+                        {
+                            loader:"less-loader",
+                            options:{
+                                javascriptEnabled:true
+                            }
+                        }
                     ]
                 },
 
@@ -105,8 +135,17 @@ module.exports = function(env) {
                 {from: '../public'}
 
             ]),
-            new ExtractTextPlugin("index.css", {allChunks: true}),
+            new MiniCssExtractPlugin( {filename:"index.css"}),
         ],
-        devtool: devtool
+        devtool: devtool,
+        devServer:{
+            proxy: {
+                '/control':{
+                    //target: 'http://localhost:8082/',
+                    target: 'http://10.222.10.57:8080/',
+                    secure: false
+                }
+            }
+        }
     }
 };

@@ -48,7 +48,7 @@ html, body, #root, .main {
 }
 
 .plusButton{
-  right: 30px;
+  right: 30px;flex-shrink
   bottom: 40px;
   position: absolute!important;
 }
@@ -96,5 +96,29 @@ html, body, #root, .main {
 .rightButtons {
   position: absolute;
   right: 0;
+}
+
+.channelItem{
+  .rightField{
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    flex-grow: 1;
+    align-items: center;
+  }
+  .info{
+    overflow: hidden;
+    flex-basis: 8em;
+    flex-grow: 1;
+    flex-shrink: 1;
+    white-space: normal;
+  }
+  .timerInfo{
+    overflow: hidden;
+    flex-basis: 5.5em;
+    .material-icons{
+      vertical-align: text-bottom;
+    }
+  }
 }
 
