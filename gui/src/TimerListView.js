@@ -5,6 +5,7 @@ import TimerEntry from './components/TimerEntry';
 import {List} from 'react-toolbox/lib/list';
 import ButtonTheme from './style/theme/fabButton.less';
 import TimerDialog from './components/TimerEdit';
+import Util from './components/Util.js';
 
 
 const urlbase="/control";
@@ -42,13 +43,6 @@ class TimerListView extends Component {
             if (cdata.channel === channel) return cdata;
         }
     }
-    startToDate(start){
-        let hhmm=start.split(':');
-        let d=new Date();
-        d.setHours(hhmm[0]);
-        d.setMinutes(hhmm[1]);
-        return d;
-    }
     getTimers(){
         let self=this;
         if (! this.state.data) return;
@@ -59,10 +53,7 @@ class TimerListView extends Component {
             let te=tlist[i];
             rt.push(te)
         }
-        rt.sort(function(x,y){
-           if ( x.weekday !== y.weekday) return x.weekday - y.weekday;
-           return self.startToDate(x.start) - self.startToDate(y.start)
-        });
+        rt.sort(Util.timerSort);
         return rt;
     }
     componentDidMount(){
