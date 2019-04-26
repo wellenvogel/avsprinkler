@@ -43,14 +43,15 @@ class ChannelItem extends Component{
             <div className="rightField" onClick={this.onItemClick}>
                 <div className="info">
                     <span className={baseTheme.itemText + " " + baseTheme.primary + " "+theme.itemText}>{caption}</span>
-                    <span class="info">{ltext}</span>
+                    <span className={baseTheme.itemText + " "+theme.itemText}>{ltext}</span>
 
                 </div>
-                <div className="timerInfo">
+                <div className={ "timerInfo " + baseTheme.itemAction} >
                     {this.props.timerSum > 0?
-                        <span><FontIcon value="timer"/>
-                        <span className="timerSum">{this.props.timerNumber}/{this.props.timerSum}min</span>
-                    </span>
+                        <span data-react-toolbox="font-icon">
+                            <FontIcon value="timer"/>
+                            <span className="timerSum" >{this.props.timerNumber}/{this.props.timerSum}min</span>
+                        </span>
                         :null
                     }
                 </div>
