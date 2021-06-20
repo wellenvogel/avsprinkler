@@ -128,12 +128,12 @@ class TimerView extends Component {
 
         };
         let EnableSwitch=function(props) {
-            let caption=props.active?"Timer Enabled":"Timer Disabled";
+            let caption=props.active?"Timer ein":"Timer aus";
             return (<ListItem caption={caption} className="timerEnable" theme={TimerEnableTheme} >
                 {props.active?
-                    <Button label="Disable" raised className="buttonStop" onClick={self.stopTimers}/>
+                    <Button label="Aus" raised className="buttonStop" onClick={self.stopTimers}/>
                     :
-                    <Button label="Enable" raised className="buttonStart" onClick={self.startTimers}/>
+                    <Button label="Ein" raised className="buttonStart" onClick={self.startTimers}/>
 
                 }
             </ListItem>);
@@ -161,9 +161,7 @@ class TimerView extends Component {
                         }
                     </List>
                 </div>
-                {timerEnabled &&
-                    <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
-                }
+                <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
                 {this.state.dialogVisible ?
                     <TimerDialog {...dialogProps}></TimerDialog>
                     :

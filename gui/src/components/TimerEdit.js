@@ -14,15 +14,6 @@ class TimerEdit extends Component {
         this.timeChange=this.timeChange.bind(this);
         this.hideDialog=this.hideDialog.bind(this);
         let self=this;
-        this.dialogDisabledActions=[
-            {label:'Löschen',onClick:function(){
-                    let url=urlbase+"?request=clearTimer&";
-                    url=self.addParametersToUrl(url);
-                    self.runCommand("Lösche Timer",url);
-                    self.hideDialog();
-                }},
-            {label:'Abbrechen',onClick:self.hideDialog}
-        ];
         this.dialogEditActions=[
             {label:'Löschen',onClick:function(){
                 let url=urlbase+"?request=clearTimer&";
@@ -86,9 +77,7 @@ class TimerEdit extends Component {
         if (! this.state.dialogVisible) return null;
         let self=this;
         let wd=-1;
-        let dialogActions=this.state.dialogTimerId?
-            (this.state.timerEnabled?this.dialogEditActions:this.dialogDisabledActions)
-            :this.dialogNewActions;
+        let dialogActions=this.state.dialogTimerId?this.dialogEditActions:this.dialogNewActions;
         return(
                 <Dialog
                     active={this.state.dialogVisible}
@@ -107,13 +96,11 @@ class TimerEdit extends Component {
     }
 
     vchange(name,value){
-        if (! this.state.timerEnabled) return;
         let ns={};
         ns[name]=value;
         this.setState(ns);
     }
     timeChange(value){
-        if (! this.state.timerEnabled) return;
         this.setState({
             dialogStart:value
         });

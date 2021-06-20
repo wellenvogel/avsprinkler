@@ -145,7 +145,6 @@ class TimerHandler:
         if ( weekday is None or weekday == timer.weekday) and (st is None or st == timer.getStartTime()):
           del self.timerlist[idx]
   def addTimer(self,timerEntry,deleteOther=False):
-    self.checkEnabled(timerEntry.channel)
     if deleteOther:
       self.removeByChannel(timerEntry.channel)
     te=timerEntry.clone()
@@ -159,7 +158,6 @@ class TimerHandler:
   def updateTimerWithId(self, timerEntry):
     if timerEntry.id is None:
       raise Exception("missing id in updateTimerWithid")
-    self.checkEnabled(timerEntry.channel)
     for timer in self.timerlist:
       if timer.id != timerEntry.id and timer.checkOverlap(timerEntry):
         raise Exception("overlapping timer exists: %s" % (json.dumps(timer.info())))

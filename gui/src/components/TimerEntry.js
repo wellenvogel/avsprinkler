@@ -17,8 +17,9 @@ class TimerEntry extends Component{
     render(){
         let name="";
         if (this.props.channelName !== undefined) name=": "+this.props.channelName;
+        let enabled=this.props.timerEnabled===undefined || this.props.timerEnabled;
         return (<ListItem theme={theme}
-            caption={this.weekdayToString(this.props.weekday)+", "+this.props.start+name}
+            caption={this.weekdayToString(this.props.weekday)+", "+this.props.start+name+(enabled?"":" [aus]")}
             legend={"Dauer: "+this.props.duration+" Minuten"}
             onClick={this.onItemClick}
         >

@@ -93,7 +93,7 @@ class TimerListView extends Component {
                         {timers ?
                             timers.map(function (te) {
                                 let ti=self.getChannelInfo(te.channel);
-                                return <TimerEntry {...te}  channelName={ti.name} onItemClick={self.onItemClick}/>
+                                return <TimerEntry {...te}  channelName={ti.name} timerEnabled={ti.timerEnabled} onItemClick={self.onItemClick}/>
                             })
                             :
                             <p>Loading...</p>
