@@ -117,18 +117,26 @@ class TimerEntry:
 
 
 class TimerHandler:
-  def __init__(self, timerCallback,startThread=True):
+  def __init__(self, timerCallback,controller,startThread=True):
     self.timerThread=threading.Thread(target=self.timerRun)
     self.timerThread.daemon=True
     if startThread:
       self.timerThread.start()
     self.timerlist=[]
     self.timerCallback=timerCallback
+    self.controller=controller
     self.running=True
     self.id=1
   def getNextId(self):
     self.id+=1
     return self.id
+  def checkEnabled(self,channel,doRaise=True):
+    rt=self.controller.isTimerEnabled(channel)
+    if rt:
+      return rt
+    if doRaise:
+      raise Exception("timer disabled for %s"%channel)
+    return False
   def removeByChannel(self,channel,weekday=None,start=None):
     st=TimerEntry.convertStartTime(start) if start is not None else None
     for idx in xrange(len(self.timerlist)-1,-1,-1):
@@ -137,6 +145,7 @@ class TimerHandler:
         if ( weekday is None or weekday == timer.weekday) and (st is None or st == timer.getStartTime()):
           del self.timerlist[idx]
   def addTimer(self,timerEntry,deleteOther=False):
+    self.checkEnabled(timerEntry.channel)
     if deleteOther:
       self.removeByChannel(timerEntry.channel)
     te=timerEntry.clone()
@@ -150,6 +159,7 @@ class TimerHandler:
   def updateTimerWithId(self, timerEntry):
     if timerEntry.id is None:
       raise Exception("missing id in updateTimerWithid")
+    self.checkEnabled(timerEntry.channel)
     for timer in self.timerlist:
       if timer.id != timerEntry.id and timer.checkOverlap(timerEntry):
         raise Exception("overlapping timer exists: %s" % (json.dumps(timer.info())))
@@ -171,6 +181,8 @@ class TimerHandler:
     nextTimer=None
     nextFire=None
     for timer in self.timerlist:
+      if not self.checkEnabled(timer.channel,False):
+        continue
       next=timer.nextFire(now)
       if next is not None:
         if nextTimer is None:

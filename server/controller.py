@@ -64,6 +64,11 @@ class Controller:
     if self.activeChannel is not None and self.activeChannel != channel:
       self.stop()
     self.stopTime=None
+    ch=self.hardware.getOutput(channel)
+    if ch is None:
+      raise Exception("no channel %s found"%channel)
+    if not ch.isTimerEnabled():
+      raise Exception("timer disabled for channel %s"%channel)
     now = time.time()
     if runtime is None:
       cfg=self.config.get(str(channel))
@@ -78,7 +83,6 @@ class Controller:
     self.logger.info("switching on %d till %s"%(channel, time.ctime(self.stopTime)))
     self.activeChannel=channel
     self.hardware.startOutput(channel)
-    ch=self.hardware.getOutput(channel)
     self.writeStatus()
     self.history.addEntry("START,%d,%s,%d,%d"%
                           (channel,
@@ -86,6 +90,17 @@ class Controller:
                            ch.getAccumulatedTime(),
                            int(ch.getAccumulatedCount()/self.hardware.getMeter().getPPl())))
 
+  def isTimerEnabled(self,channel):
+    ch=self.hardware.getOutput(channel)
+    if ch is None:
+      return False
+    return ch.isTimerEnabled()
+  def enableDisableTimer(self,channel,enable):
+    ch=self.hardware.getOutput(channel)
+    if ch is None:
+      raise Exception("channel %s not found"%channel)
+    ch.timerEnabled=enable
+    self.writeStatus()
   def getStatus(self):
     if self.activeChannel is None or not self.hardware.isOn(self.activeChannel):
       return {

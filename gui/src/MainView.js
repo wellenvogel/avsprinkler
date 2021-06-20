@@ -93,6 +93,7 @@ class ExampleView extends Component {
                                 id:x.channel,
                                 time:x.accumulatedTime,
                                 count: x.accumulatedCount,
+                                timerEnabled: x.timerEnabled,
                                 timerSum: timerSum,
                                 timerNumber:timerNumber,
                                 onStart: self.onStart,

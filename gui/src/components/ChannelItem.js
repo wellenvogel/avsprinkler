@@ -31,7 +31,7 @@ class ChannelItem extends Component{
         }
         let caption=this.props.name||"Channel "+this.props.id;
         return (
-        <div className={"channelItem " + baseTheme.listItem + " "+baseTheme.item}>
+        <div className={"channelItem " + baseTheme.listItem + " "+baseTheme.item + (this.props.timerEnabled?"":" timerDisabled")}>
             <span className={baseTheme.itemAction}>
             {this.props.active?
                 <Button label="Stop" raised className="buttonStop" onClick={this.onStop}/>

@@ -73,6 +73,18 @@ class Main:
         'status': 'OK',
         'data': self.timers.info()
       }
+    if request == 'enableTimer':
+      channel = self.getHttpRequestParam(param, 'channel')
+      if channel is None:
+        raise Exception("missing parameter channel")
+      self.controller.enableDisableTimer(int(channel),True)
+      return {'status':'OK'}
+    if request == 'disableTimer':
+      channel = self.getHttpRequestParam(param, 'channel')
+      if channel is None:
+        raise Exception("missing parameter channel")
+      self.controller.enableDisableTimer(int(channel),False)
+      return {'status':'OK'}
     if request == 'addTimer' or request == 'updateTimer':
       rq=['channel','start','weekday','duration']
       map={}
@@ -137,7 +149,7 @@ class Main:
     self.controller=controller.Controller()
     self.controller.readStatus()
     timerfilename=self.getTimerFileName()
-    self.timers = timerh.TimerHandler(self._timercb)
+    self.timers = timerh.TimerHandler(self._timercb,self.controller)
     if os.path.exists(timerfilename):
       self.logger.info("reading timers from %s"%(timerfilename))
       self.timers.readFromJson(open(timerfilename).read())

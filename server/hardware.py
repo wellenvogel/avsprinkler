@@ -31,6 +31,8 @@ class ChannelDevice:
     return (GPIO.input(self.getGpio()) != DEFAULT_OUT)
   def getName(self):
     return self.name
+  def isTimerEnabled(self):
+    return True
   def info(self):
     return{
       'channel': self.getChannel(),
@@ -44,10 +46,13 @@ class Output(ChannelDevice):
     self.switchTime=None
     self.accumulated=0
     self.startcount=0
-    self.accumulatedCount=0;
+    self.accumulatedCount=0
+    self.timerEnabled=True
     GPIO.setup(self.getGpio(),GPIO.OUT)
     GPIO.output(self.getGpio(),DEFAULT_OUT)
     self.logger.info("setup output at gpio %d, value %d"%(self.getGpio(),DEFAULT_OUT))
+  def isTimerEnabled(self):
+    return self.timerEnabled
   def switchOn(self,count=0):
     self.switchTime=time.time()
     self.startcount=count
@@ -79,12 +84,14 @@ class Output(ChannelDevice):
     rt=ChannelDevice.info(self)
     rt['accumulatedTime']=self.accumulated
     rt['accumulatedCount']=self.accumulatedCount
+    rt['timerEnabled']=self.timerEnabled
     return rt
   def getStatus(self):
     return {
       'channel':self.channel,
       'accumulatedTime':self.accumulated,
-      'accumulatedCount':self.accumulatedCount
+      'accumulatedCount':self.accumulatedCount,
+      'timerEnabled': self.timerEnabled
     }
   def setStatus(self,map):
     v=map.get('accumulatedTime')
@@ -93,6 +100,11 @@ class Output(ChannelDevice):
     v=map.get('accumulatedCount')
     if v is not None:
       self.accumulatedCount=v
+    v=map.get('timerEnabled')
+    if v is not None:
+      self.timerEnabled=v
+    else:
+      self.timerEnabled=True
 
 class Input(ChannelDevice):
   def __init__(self,cfg,deadHandler,pup=GPIO.PUD_UP):

@@ -48,7 +48,7 @@ html, body, #root, .main {
 }
 
 .plusButton{
-  right: 30px;flex-shrink
+  right: 30px;
   bottom: 40px;
   position: absolute!important;
 }
@@ -86,7 +86,7 @@ html, body, #root, .main {
   overflow: auto;
   width: 100%;
 }
-.timerSwitch{
+.timerSwitch, .timerEnable{
   border-bottom: 1px solid rgba(0, 0, 0, 0.58);
 }
 
@@ -127,5 +127,8 @@ html, body, #root, .main {
       font-size: 0.6em;
     }
   }
+}
+.timerDisabled .timerInfo {
+  opacity: 0.6;
 }
 

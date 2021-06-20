@@ -2,13 +2,17 @@ import React, { Component } from 'react';
 import ToolBar from './components/ToolBar';
 import {Button,IconButton} from 'react-toolbox/lib/button';
 import TimerEntry from './components/TimerEntry';
-import {List} from 'react-toolbox/lib/list';
+import {List, ListItem} from 'react-toolbox/lib/list';
 import ButtonTheme from './style/theme/fabButton.less';
 import TimerDialog from './components/TimerEdit';
 import Util from './components/Util.js';
+import TimerEnableTheme from "./style/theme/timerEnable.less";
 
 
 const urlbase="/control";
+
+
+
 class TimerView extends Component {
 
     constructor(props){
@@ -19,6 +23,8 @@ class TimerView extends Component {
         this.onItemClick=this.onItemClick.bind(this);
         this.onPlus=this.onPlus.bind(this);
         this.hideDialog=this.hideDialog.bind(this);
+        this.startTimers=this.startTimers.bind(this);
+        this.stopTimers=this.stopTimers.bind(this);
     }
     fetchStatus(){
         let self=this;
@@ -68,14 +74,44 @@ class TimerView extends Component {
     componentWillUnmount(){
         clearInterval(this.interval);
     }
+    runEnableDisable(enable){
+        let self=this;
+        let url="/control?request=";
+        if (enable) url+="enableTimer"
+        else url+="disableTimer";
+        url+="&channel="+encodeURIComponent(this.getChannel());
+        fetch(url,{
+            credentials: 'same-origin'
+        }).then(function(response){
+            if (! response.ok){
+                alert("Error: "+response.statusText);
+                throw new Error(response.statusText)
+            }
+            return response.json()
+        }).then(function(jsonData){
+            if (jsonData.status !== 'OK'){
+                alert("enable/disable failed: "+jsonData.info);
+            }else{
+                self.fetchStatus();
+            }
+        })
+    }
+    stopTimers(){
+        this.runEnableDisable(false);
+    }
+    startTimers(){
+        this.runEnableDisable(true);
+    }
     render() {
         let self=this;
         let info=this.state;
         let title=info.title||"TimerView";
+        let timerEnabled=false;
         if (info.data){
             let cinfo=this.getChannelInfo(this.getChannel());
             if (cinfo){
                 title="Timer "+cinfo.name
+                timerEnabled=cinfo.timerEnabled;
             }
         }
         let timers=this.getTimers(this.getChannel());
@@ -87,8 +123,20 @@ class TimerView extends Component {
             dialogDuration: this.state.dialogDuration,
             dialogTimerId: this.state.dialogTimerId,
             hideCallback: this.hideDialog,
+            timerEnabled: timerEnabled,
             callback: function(tp){self.setState({dialogDuration:tp.dialogDuration});self.fetchStatus();}
 
+        };
+        let EnableSwitch=function(props) {
+            let caption=props.active?"Timer Enabled":"Timer Disabled";
+            return (<ListItem caption={caption} className="timerEnable" theme={TimerEnableTheme} >
+                {props.active?
+                    <Button label="Disable" raised className="buttonStop" onClick={self.stopTimers}/>
+                    :
+                    <Button label="Enable" raised className="buttonStart" onClick={self.startTimers}/>
+
+                }
+            </ListItem>);
         };
         return (
             <div className="view timerView">
@@ -102,6 +150,7 @@ class TimerView extends Component {
                     </span>
                 </ToolBar>
                 <div className="mainDiv">
+                    <EnableSwitch active={timerEnabled}/>
                     <List>
                         {timers ?
                             timers.map(function (te) {
@@ -112,12 +161,15 @@ class TimerView extends Component {
                         }
                     </List>
                 </div>
-                <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
+                {timerEnabled &&
+                    <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
+                }
                 {this.state.dialogVisible ?
                     <TimerDialog {...dialogProps}></TimerDialog>
                     :
                     null
                 }
+
 
             </div>
         );
@@ -135,7 +187,6 @@ class TimerView extends Component {
             dialogWeekday:te.weekday,
             dialogStart:te.start,
             dialogDuration:te.duration,
-            dialogActions:this.dialogEditActions
         });
     }
     onPlus(){
@@ -144,8 +195,7 @@ class TimerView extends Component {
             dialogTimerId:0,
             dialogWeekday:0,
             dialogStart:"06:00",
-            dialogDuration:this.state.dialogDuration||20,
-            dialogActions:this.dialogNewActions
+            dialogDuration:this.state.dialogDuration||20
         });
     }
 }
