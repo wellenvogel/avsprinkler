@@ -49,7 +49,7 @@ class Main:
       time=self.getHttpRequestParam(param,'duration')
       if channel is None:
         raise Exception("missing parameter channel")
-      self.controller.start(int(channel),int(time) if time is not None else None)
+      self.controller.start(int(channel),int(time) if time is not None else None,manual=True)
       return{
         'status':'OK',
         'data': self.controller.getStatus()

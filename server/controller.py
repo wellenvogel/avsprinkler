@@ -59,15 +59,15 @@ class Controller:
     if channel == 0:
       self.stop()
     else:
-      self.start(channel)
-  def start(self,channel,runtime=None):
+      self.start(channel,manual=True)
+  def start(self,channel,runtime=None,manual=None):
     if self.activeChannel is not None and self.activeChannel != channel:
       self.stop()
     self.stopTime=None
     ch=self.hardware.getOutput(channel)
     if ch is None:
       raise Exception("no channel %s found"%channel)
-    if not ch.isTimerEnabled():
+    if not manual and not ch.isTimerEnabled():
       raise Exception("timer disabled for channel %s"%channel)
     now = time.time()
     if runtime is None:
