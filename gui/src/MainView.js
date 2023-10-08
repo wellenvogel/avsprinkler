@@ -6,6 +6,7 @@ import Dialog from 'react-toolbox/lib/dialog';
 import {ListItem} from "react-toolbox/lib/list";
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import TimerSwitchTheme from './style/theme/timerSwitch.less';
+import dialogTheme from './style/theme/dialog.less';
 import assign from 'object-assign';
 
 const urlbase="/control";
@@ -118,7 +119,7 @@ class ExampleView extends Component {
                     })}
                     </List>
                 </div>
-                <Dialog actions={dialogActions}
+                <Dialog actions={dialogActions} theme={dialogTheme}
                 active={this.state.dialogVisible}
                 title={"Starte Kanal "+self.state.channel}>
                     <p>Laufzeit(Minuten)</p>

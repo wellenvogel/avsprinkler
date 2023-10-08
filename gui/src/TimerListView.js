@@ -64,6 +64,16 @@ class TimerListView extends Component {
     componentWillUnmount(){
         clearInterval(this.interval);
     }
+    getChannelDisplayList(){
+        if (! this.state.data) return;
+        let channels=this.state.data.channels.outputs;
+        if (! channels) return;
+        let rt=[];
+        for (let i=0;i<channels.length;i++){
+            rt.push({label:channels[i].name,value:channels[i].channel})
+        }
+        return rt;
+    }
     render() {
         let self=this;
         let info=this.state;
@@ -78,8 +88,16 @@ class TimerListView extends Component {
             dialogTimerId: this.state.dialogTimerId,
             dialogTitle: this.state.dialogTitle,
             hideCallback: this.hideDialog,
-            callback: function(tp){self.fetchStatus();}
-
+            callback: function(tp){
+                self.setState({
+                    dialogChannel:tp.dialogChannel,
+                    dialogDuration: tp.dialogDuration,
+                    dialogStart: tp.dialogStart,
+                    dialogWeekday: tp.dialogWeekday
+                    });
+                self.fetchStatus();
+            },
+            channelSelector: this.state.dialogChannelList
         };
         return (
             <div className="view timerView">
@@ -105,6 +123,7 @@ class TimerListView extends Component {
                     :
                     null
                 }
+                <Button icon="add" floating primary onClick={this.onPlus} className="plusButton" theme={ButtonTheme}/>
 
             </div>
         );
@@ -127,15 +146,17 @@ class TimerListView extends Component {
             dialogTitle:this.getChannelInfo(te.channel).name
         });
     }
-    //TODO: do we want plus here?
     onPlus(){
+        let channelList=this.getChannelDisplayList();
+        if (! channelList) return;
         this.setState({
             dialogVisible:true,
-            dialogTimerId:0,
-            dialogWeekday:0,
-            dialogStart:"06:00",
+            dialogTimerId:undefined,
+            dialogWeekday:this.state.dialogWeekday||0,
+            dialogStart:this.state.dialogStart||"06:00",
             dialogDuration:this.state.dialogDuration||15,
-            dialogActions:this.dialogNewActions
+            dialogActions:this.dialogNewActions,
+            dialogChannelList: channelList
         });
     }
 }

@@ -4,6 +4,7 @@ import {RadioGroup,RadioButton} from 'react-toolbox/lib/radio';
 import Util from './Util';
 import RadioTheme from '../style/theme/radioButton.less';
 import Input from 'react-toolbox/lib/input';
+import Dropdown from 'react-toolbox/lib/dropdown';
 const urlbase="/control";
 class TimerEdit extends Component {
 
@@ -40,6 +41,7 @@ class TimerEdit extends Component {
                 self.hideDialog();
             }}
         );
+        this.dialogNoCHannelActions=[this.dialogEditActions[1]];
     }
     runCommand(text,url){
         let self=this;
@@ -55,7 +57,12 @@ class TimerEdit extends Component {
             if (jsonData.status !== 'OK'){
                 alert(text+" failed: "+jsonData.info);
             }else{
-                self.state.callback(self.state)
+                self.state.callback({
+                    dialogChannel: self.state.dialogChannel,
+                    dialogWeekday: self.state.dialogWeekday,
+                    dialogStart: Util.addDuration(self.state.dialogStart,self.state.dialogDuration+5),
+                    dialogDuration: self.state.dialogDuration
+                })
             }
         })
     }
@@ -77,12 +84,22 @@ class TimerEdit extends Component {
         if (! this.state.dialogVisible) return null;
         let self=this;
         let wd=-1;
-        let dialogActions=this.state.dialogTimerId?this.dialogEditActions:this.dialogNewActions;
+        let dialogActions=this.state.dialogChannel?(this.state.dialogTimerId?this.dialogEditActions:this.dialogNewActions):this.dialogNoCHannelActions;
         return(
                 <Dialog
                     active={this.state.dialogVisible}
                     actions={dialogActions}
                     title={this.state.dialogTitle?this.state.dialogTitle:"Timer"}>
+                    {this.props.channelSelector && 
+                        <Dropdown
+                            auto
+                            label="Kanal"
+                            onChange={(value)=>this.setState({dialogChannel:value})}
+                            source={this.props.channelSelector}
+                            value={this.state.dialogChannel}>
+
+                            </Dropdown>
+                    }    
                     <RadioGroup value={this.state.dialogWeekday} onChange={function(v){self.vchange('dialogWeekday',v)}}>
                         {Util.weekdays.map((el)=>{
                             wd++;

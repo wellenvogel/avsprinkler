@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ToolBar from './components/ToolBar';
+import Util from './components/Util';
 import {List,ListItem} from 'react-toolbox/lib/list';
 
 
@@ -75,6 +76,9 @@ class HistoryView extends Component {
             re.datev=new Date(dtkind[0]);
             re.date=dtkind[0];
             re.info=param[2]+": "+Math.round(param[5]/60)+"min, "+param[6]+"l (Sum: "+Math.round(param[3]/60)+"min/ "+param[4]+"l)";
+            let wd=re.datev.getDay()-1;
+            if (wd < 0) wd=6;
+            re.wd=Util.weekdays[wd];
             rt.push(re);
         });
         rt.sort(function(x,y){
@@ -104,7 +108,7 @@ class HistoryView extends Component {
                     <List>
                         {entries ?
                             entries.map(function (te) {
-                                return <ListItem caption={te.date} legend={te.info}/>
+                                return <ListItem caption={te.wd+" "+te.date} legend={te.info}/>
                             })
                             :
                             <p>Loading...</p>

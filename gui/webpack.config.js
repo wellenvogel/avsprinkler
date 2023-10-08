@@ -142,7 +142,7 @@ module.exports = function(env) {
             proxy: {
                 '/control':{
                     //target: 'http://localhost:8082/',
-                    target: 'http://10.222.10.57:8080/',
+                    target: process.env.TESTSERVER || 'http://10.222.10.57:8080/',
                     secure: false
                 }
             }
