@@ -9,7 +9,7 @@ import logging
 import logging.handlers
 import Constants
 import httpserver
-
+import sys
 
 class Main:
   def getHttpRequestParam(cls,requestparam,name):
@@ -29,7 +29,8 @@ class Main:
     if h is not None:
       h.write(timercfg)
       h.close()
-      os.unlink(fn)
+      if os.path.exists(fn):
+        os.unlink(fn)
       os.rename(tmp,fn)
     else:
       raise Exception("unable to open "+tmp)
@@ -139,7 +140,7 @@ class Main:
   def _timercb(self,timer):
     self.logger.info("timer fired, channel=%d, on=%d minutes"%(timer.channel,timer.duration))
     self.controller.start(timer.channel,timer.duration*60)
-  def start(self):
+  def start(self,gui="gui",port=8080):
     self.logger=logging.getLogger(Constants.LOGNAME)
     self.logger.setLevel(logging.INFO)
     handler=logging.handlers.TimedRotatingFileHandler(filename="sprinkler.log",when="D")
@@ -154,9 +155,15 @@ class Main:
       self.logger.info("reading timers from %s"%(timerfilename))
       self.timers.readFromJson(open(timerfilename).read())
       self.logger.info(pprint.pformat(self.timers.info()))
-    self.httpServer=httpserver.HTTPServer(httpserver.HTTPHandler,self)
+    self.httpServer=httpserver.HTTPServer(httpserver.HTTPHandler,self,gui=gui,port=port)
 
 main=Main()
-main.start()
+port=8080
+gui="gui"
+if len(sys.argv) > 1:
+  port=int(sys.argv[1])
+if len(sys.argv) > 2:
+  gui=sys.argv[2]
+main.start(gui=gui,port=port)
 while True:
   time.sleep(10)

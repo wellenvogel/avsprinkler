@@ -115,10 +115,10 @@ class Controller:
         'id':ch.getChannel(),
         'name':ch.getName(),
         'started':ch.getSwitchTime(),
-        'running':time.time()-ch.getSwitchTime(),
+        'running':time.time()-(ch.getSwitchTime() or time.time()),
         'remain': (self.stopTime - time.time()) if self.stopTime is not None else 0,
         'startCount':ch.getStartCount(),
-        'runtime': self.stopTime-ch.getSwitchTime()
+        'runtime': self.stopTime-ch.getSwitchTime() if (ch.getSwitchTime() is not None  and self.stopTime is not None )else 0
       },
       'meter': self.hardware.getMeter().getValue(),
       'ppl': self.hardware.getMeter().getPPl()

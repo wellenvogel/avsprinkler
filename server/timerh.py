@@ -205,7 +205,7 @@ class TimerHandler:
           self.checkAndRunTimer(time.time())
         time.sleep(1)
       except:
-        print "Exception in timerloop"
+        print("Exception in timerloop")
 
   def info(self):
     return{

@@ -1,7 +1,29 @@
 import logging
 import threading
-
-import RPi.GPIO as GPIO
+try:
+  import RPi.GPIO as GPIO
+except:
+  class GPIODummy:
+    LOW=0
+    HIGH=1
+    OUT="out"
+    IN="in"
+    PUD_UP=99
+    BCM="bcm"
+    FALLING="falling"
+    def input(self,channel):
+      return self.LOW
+    def setup(self,channel,mode,**kwargs):
+      print("GPIO setup c=%s,m=%s"%(channel,mode))
+      pass
+    def output(self,channel,v):
+      print("GPIO out c=%s,v=%s"%(channel,v))
+      pass
+    def setmode(self,m):
+      print("GPIO setmode %s"%m)
+    def add_event_detect(self,channel,mode,**kwargs):
+      print("GPIO add_event_detect c=%s,mode=%s"%(channel,mode))
+  GPIO=GPIODummy() 
 import json
 import os
 import time

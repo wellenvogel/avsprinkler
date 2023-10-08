@@ -16,14 +16,14 @@ import Constants
 
 class HTTPServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
 
-  def __init__(self, RequestHandlerClass,controller):
-    self.basedir =os.path.join(os.path.dirname(os.path.relpath(__file__)),"gui")
+  def __init__(self, RequestHandlerClass,controller,gui="gui",port=8080):
+    self.basedir =os.path.join(os.path.dirname(os.path.relpath(__file__)),gui)
     self.overwrite_map = ({
       '.png': 'image/png',
       '.js': 'text/javascript; charset=utf-8'
     })
     self.controller=controller
-    BaseHTTPServer.HTTPServer.__init__(self, ("0.0.0.0",8080), RequestHandlerClass, True)
+    BaseHTTPServer.HTTPServer.__init__(self, ("0.0.0.0",port), RequestHandlerClass, True)
     self.serve_forever()
 
   def getUrlPath(self, path):

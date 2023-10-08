@@ -1,6 +1,1 @@
-{"timer":
-[
-  {"channel": 1, "duration": 30, "start": "06:00", "weekday": 0},
-  {"channel": 1, "duration": 30, "start": "06:00", "weekday": 5},
-  {"channel": 2, "duration": 30, "start": "06:00", "weekday": 1}
-]}
+{"running": false, "timer": []}
